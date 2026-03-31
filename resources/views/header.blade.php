@@ -18,7 +18,7 @@
                 top: 0;
                 width: 280px;
                 height: 100vh;
-                background: linear-gradient(135deg, #d41616 0%, #a01212 100%);
+                background: linear-gradient(135deg, #eb0000 0%, #bd0000 100%);
                 overflow-y: auto;
                 padding-top: 20px;
                 z-index: 1000;

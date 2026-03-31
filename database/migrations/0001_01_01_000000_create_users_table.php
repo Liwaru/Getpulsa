@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('no_hp_user')->unique();
+            $table->integer('level')->default(1);
+            $table->integer('total_pulsa')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

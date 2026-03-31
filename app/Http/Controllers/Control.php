@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Models\Pulsa;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 class Control extends Controller
 {
@@ -80,8 +80,10 @@ public function aksi_register(Request $request)
     ]);
 
     // simpan data
-    Pulsa::create([
+    User::create([
         'name' => $request->name,
+        'email' => $request->phone . '@temp.local',
+        'password' => bcrypt('password'),
         'no_hp_user' => $request->phone,
         'level' => 1,
         'total_pulsa' => 0
