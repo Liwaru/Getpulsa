@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>AbsensiKu</title>
+    <title>Getpulsa</title>
 
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
@@ -244,30 +244,34 @@
                 </a>
             </li>
             <li>
-                <a href="/paket-data">
+                <a href="/paket_data">
                     <i class="bi bi-box"></i> Paket Data
                 </a>
             </li>
             <li>
-                <a href="/riwayat-data">
-                    <i class="bi bi-file-earmark-text"></i> Riwayat Data
+                <a href="/riwayat-transaksi">
+                    <i class="bi bi-file-earmark-text"></i> Riwayat Transaksi
                 </a>
             </li>
         @elseif(session('level') == 2)
-            <!-- Admin (Level 2) Menu -->
+        <li>
+                <a href="/profil">
+                    <i class="bi bi-person-circle"></i> Profil
+                </a>
+            </li>
+            <li>
+                <a href="/paket_data">
+                    <i class="bi bi-box"></i> Paket Data
+                </a>
+            </li>
             <li>
                 <a href="/data-user">
                     <i class="bi bi-people-fill"></i> Data User
                 </a>
             </li>
             <li>
-                <a href="/paket-data">
-                    <i class="bi bi-box"></i> Paket Data
-                </a>
-            </li>
-            <li>
-                <a href="/data-transaksi">
-                    <i class="bi bi-credit-card"></i> Data Transaksi
+                <a href="/riwayat-transaksi">
+                     <i class="bi bi-file-earmark-text"></i> Data Transaksi
                 </a>
             </li>
         @elseif(session('level') == 3)
@@ -319,25 +323,6 @@
 
 <!-- Konten utama: tanpa wrapper putih -->
 <div class="content-area">
-    <!-- Flash Messages -->
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-    
-    <!-- Konten halaman akan dimuat di sini. Sekarang benar-benar tanpa latar putih. -->
-    @yield('content')
 </div>
 
 <script>

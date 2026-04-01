@@ -352,6 +352,7 @@
     cursor: pointer;
     transition: 0.15s linear;
     font-family: inherit;
+    text-decoration: none;
 }
 .btn-beli:hover {
     background: #a50000;
@@ -366,9 +367,6 @@
     /* atau tetap hitam jika ingin netral: #0b2a3e */
 }
 
-/* Jika ingin harga tetap hitam, biarkan seperti semula, tapi pastikan kontras */
-
-/* Teks nama produk & masa aktif (sudah ok) */
 .offer-desc {
     color: #2c3e4e;  /* netral */
 }
@@ -420,12 +418,54 @@
             border: 1px solid rgba(255,255,255,0.2);
             transition: opacity 0.3s ease;
         }
-        .top-notification i {
-            font-size: 1rem;
-        }
         .top-notification.hide {
             opacity: 0;
             visibility: hidden;
+        }
+
+        /* Notifikasi tengah (center) dengan efek klik hapus */
+        /* Base untuk notifikasi (digunakan untuk sukses dan error) */
+        .center-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(6px);
+        }
+        .center-notification i:first-child {
+            font-size: 1rem;
+        }
+        .center-notification:hover {
+            transform: translateX(-50%) scale(1.02);
+        }
+        .center-notification .close-icon {
+            margin-left: 8px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        /* Warna untuk sukses */
+        .center-notification.success {
+            background: rgba(46, 125, 50, 0.96);
+        }
+        /* Warna untuk error */
+        .center-notification.error {
+            background: rgba(220, 53, 69, 0.96);
+        }
+        .center-notification.error:hover {
+            background: rgba(200, 40, 55, 0.96);
         }
 
         /* Responsif */
@@ -475,6 +515,8 @@
 </div>
 @endif -->
 
+<!-- TIDAK ADA LAGI DIV ALERT-ERROR, DIGANTI DENGAN NOTIFIKASI JAVASCRIPT -->
+
 <div class="white-dashboard">
     <div class="dashboard-inner">
         <!-- GABUNGAN profile, prabayar, stats grid -->
@@ -520,7 +562,11 @@
                 </div>
                 <div class="stat-block">
                     <div class="stat-label"><i class="fas fa-database"></i> Sisa Kuota</div>
-                    <div class="stat-amount">{{ number_format(session('total_kuota') ?? 0, 1) }} <span style="font-size:1rem;">GB</span></div>
+                    <div class="stat-amount">{{ number_format(session('total_kuota') ?? 0, 1) }} <span style="font-size:1rem;">GB</span>
+                        <button class="plus-circle" id="plusKuotaBtn" title="Tambah kuota">
+                            <i class="fas fa-plus"></i>
+                        </button>
+</div>
                 </div>
             </div>
         </div>
@@ -536,14 +582,14 @@
             <h3>Untuk Kamu</h3>
         </div>
 <div class="offers-list">
-    @foreach($produk as $item)
-        <div class="offer-card" data-offer="{{ $item->id_produk }}">
+    @foreach($kuota as $item)
+        <div class="offer-card" data-offer="{{ $item->id_kuota }}">
             <div class="offer-header">
-                <!-- Sesuaikan ikon berdasarkan id_produk (opsional) -->
-                @if($item->id_produk == 5)
+                <!-- Sesuaikan ikon berdasarkan id_kuota (opsional) -->
+                @if($item->id_kuota == 5)
                     <i class="fas fa-lightbulb"></i>
                     <h4>Saran</h4>
-                @elseif($item->id_produk == 6)
+                @elseif($item->id_kuota == 6)
                     <i class="fas fa-tag"></i>
                     <h4>Promo</h4>
                 @else
@@ -552,28 +598,24 @@
                 @endif
             </div>
             <div class="offer-desc">
-                {{ $item->nama_produk }} • {{ $item->masa_aktif }}
+                {{ $item->kuota }} • {{ $item->masa_berlaku }}
             </div>
             <!-- Tambahkan elemen meta/warning jika diperlukan, misal untuk id 5 -->
-            @if($item->id_produk == 5)
+            @if($item->id_kuota == 5)
 <div class="recommend-text">
     <i class="fas fa-thumbs-up"></i> lebih cocok untuk kamu
 </div>            @endif
-            @if($item->id_produk == 6)
+            @if($item->id_kuota == 6)
                 <div class="offer-meta"><i class="fas fa-gem"></i> Lebih hemat untuk kamu</div>
             @endif
             <div class="price-row">
                 <div>
                     <span class="price">Rp{{ number_format($item->harga, 0, ',', '.') }}</span>
-                    @if($item->id_produk == 6)
+                    @if($item->id_kuota == 6)
                         <span class="price-striked">Rp100.000</span> <!-- harga coret contoh -->
                     @endif
                 </div>
-                <button class="btn-beli beli-action" 
-                        data-paket="{{ $item->nama_produk }} - Rp{{ number_format($item->harga, 0, ',', '.') }}" 
-                        data-id="{{ $item->id_produk }}">
-                     Beli
-                </button>
+                <a href="{{ route('payment.kuota', ['id_kuota' => $item->id_kuota]) }}" class="btn-beli">Beli</a>
             </div>
         </div>
     @endforeach
@@ -643,23 +685,27 @@
             });
         }
 
-        const beliButtons = document.querySelectorAll('.beli-action');
-        beliButtons.forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const packageName = btn.getAttribute('data-paket') || 'Paket pilihan';
-                showToast(`✅ [TEST MODE] Pembelian ${packageName} berhasil diproses (simulasi authorized)`, 'success');
-                console.log(`[DarkForge-X | Audit] Purchase initiated: ${packageName} at ${new Date().toISOString()}`);
+        // ========== TAMBAHKAN UNTUK TOMBOL + KUOTA ==========
+        const plusKuotaBtn = document.getElementById('plusKuotaBtn');
+        if (plusKuotaBtn) {
+            plusKuotaBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = '/paket_data';
             });
-        });
+        }
+
+        // ========== TOMBOL BELI SUDAH DIGANTI DENGAN LINK, JADI HAPUS EVENT LISTENER ==========
+        // (tidak ada lagi listener untuk .beli-action)
 
         const allOffers = document.querySelectorAll('.offer-card');
         allOffers.forEach(card => {
             card.addEventListener('click', (e) => {
-                if (e.target.classList && !e.target.classList.contains('beli-action') && !e.target.closest('.beli-action')) {
-                    const titleCard = card.querySelector('h4')?.innerText || 'Paket';
-                    showToast(`Detail: ${titleCard} — silakan tekan tombol Beli untuk pembelian resmi`, 'info');
+                // Jangan ganggu jika yang diklik adalah tombol beli (link)
+                if (e.target.classList && (e.target.classList.contains('btn-beli') || e.target.closest('.btn-beli'))) {
+                    return;
                 }
+                const titleCard = card.querySelector('h4')?.innerText || 'Paket';
+                showToast(`Detail: ${titleCard} — silakan tekan tombol Beli untuk pembelian resmi`, 'info');
             });
         });
 
@@ -695,6 +741,43 @@
 
         console.log('DarkForge-X | White Table Component Loaded — fully authorized simulation dashboard');
     })();
+
+    // Fungsi menampilkan notifikasi sukses di tengah atas (dapat diklik)
+    function showCenterNotification(message, type = 'success') {
+        const notif = document.createElement('div');
+        // Tentukan kelas berdasarkan tipe
+        notif.className = 'center-notification ' + type;
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        notif.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+            <i class="fas fa-times close-icon"></i>
+        `;
+        
+        document.body.appendChild(notif);
+        
+        // Klik pada notifikasi (atau tombol close) akan menghapusnya
+        notif.addEventListener('click', (e) => {
+            notif.remove();
+        });
+        
+        // Otomatis hilang setelah 5 detik
+        setTimeout(() => {
+            if (notif.parentNode) notif.remove();
+        }, 5000);
+    }
+
+    // Jika ada session success, tampilkan notifikasi sukses
+    @if(session('success'))
+        showCenterNotification('{{ session('success') }}', 'success');
+    @endif
+
+    // Jika ada session error, tampilkan notifikasi error
+    @if(session('error'))
+        showCenterNotification('{{ session('error') }}', 'error');
+    @endif
 </script>
 </body>
 </html>
