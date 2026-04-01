@@ -29,7 +29,7 @@ class Control extends Controller
         return view('login');
     }
 
-    public function aksi_login(Request $request)
+public function aksi_login(Request $request)
     {
         // VALIDASI CAPTCHA
         if ($request->captcha != (session('num1') + session('num2'))) {
@@ -52,12 +52,14 @@ class Control extends Controller
                 'total_kuota'=> $user->total_kuota ?? 0
             ]);
 
+            // FLASH MESSAGE SELAMAT DATANG
+            session()->flash('welcome', 'Selamat datang, ' . $user->nama);
+
             return redirect('/home');
         }
 
         return back()->with('error', 'No HP tidak terdaftar!');
     }
-
     public function register()
     {
         $num1 = rand(1, 9);
@@ -101,6 +103,7 @@ class Control extends Controller
 public function home()
 {
     if (!session('id_user')) {
+        session()->flash('welcome', 'Selamat datang, ' . Auth::user()->name);
         return redirect('/login');
     }
 
@@ -173,5 +176,48 @@ public function tambah_pulsa()
     // Anda bisa mengirim data lain yang diperlukan, misalnya daftar nominal pulsa
     // Untuk sementara kita hanya mengembalikan view
     return view('tambah_pulsa');
+}
+
+// Menampilkan halaman profil
+public function profil()
+{
+    if (!session('id_user')) {
+        return redirect('/login');
+    }
+
+    $user = DB::table('users')->where('id_user', session('id_user'))->first();
+
+    return view('profil', compact('user'));
+}
+
+public function updateProfil(Request $request)
+{
+    if (!session('id_user')) {
+        return redirect('/login');
+    }
+
+    $userId = session('id_user');
+
+    $request->validate([
+        'name'     => 'required|string|max:255',
+    ]);
+
+    $updateData = [
+        'nama'       => $request->name,
+    ];
+
+    if ($request->filled('password')) {
+        $updateData['password'] = bcrypt($request->password);
+    }
+
+    DB::table('users')->where('id_user', $userId)->update($updateData);
+
+    $updatedUser = DB::table('users')->where('id_user', $userId)->first();
+    session([
+        'name'       => $updatedUser->nama,
+    ]);
+
+    // Redirect ke halaman home dengan pesan sukses
+    return redirect('/home')->with('success', 'Profil berhasil diperbarui.');
 }
 }

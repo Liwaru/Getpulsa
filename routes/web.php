@@ -10,3 +10,6 @@ Route::post('/register', [Control::class, 'aksi_register']);
 
 Route::get('/home', [Control::class, 'home']);
 Route::get('/tambah_pulsa', [Control::class, 'tambah_pulsa']);
+
+Route::get('/profil', [Control::class, 'profil'])->name('profil');
+Route::post('/profile/update', [Control::class, 'updateProfil']);

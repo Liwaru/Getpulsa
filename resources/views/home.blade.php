@@ -90,6 +90,23 @@
             letter-spacing: -0.3px;
         }
 
+        /* welcome message di sebelah kanan */
+        .welcome-message {
+            font-size: 1rem;
+            font-weight: 500;
+            background: #eef2f8;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            color: #d80000;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .welcome-message i {
+            font-size: 0.9rem;
+        }
+
         /* PraBayar section dalam gabungan (tanpa background terpisah) */
         .prabayar-card {
             display: flex;
@@ -381,6 +398,36 @@
             text-align: center;
         }
 
+        /* NOTIFIKASI TOP CENTER */
+        .top-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2e7d32;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            background: rgba(46, 125, 50, 0.95);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: opacity 0.3s ease;
+        }
+        .top-notification i {
+            font-size: 1rem;
+        }
+        .top-notification.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         /* Responsif */
         @media (max-width: 768px) {
             .white-dashboard {
@@ -406,10 +453,28 @@
                 height: 28px;
                 font-size: 0.9rem;
             }
+            .welcome-message {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+                white-space: normal;
+            }
+            .top-notification {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+                top: 10px;
+            }
         }
     </style>
 </head>
 <body>
+
+<!-- NOTIFIKASI TOP CENTER (untuk sukses update profil dll) -->
+<!-- @if(session('success'))
+<div id="topNotif" class="top-notification">
+    <i class="fas fa-check-circle"></i> {{ session('success') }}
+</div>
+@endif -->
+
 <div class="white-dashboard">
     <div class="dashboard-inner">
         <!-- GABUNGAN profile, prabayar, stats grid -->
@@ -421,6 +486,10 @@
                     <div class="user-text">
                         <h2>{{ session('name') }}</h2>
                     </div>
+                </div>
+                <!-- Welcome message di sebelah kanan -->
+                <div class="welcome-message">
+                     Selamat datang, {{ session('name') }}
                 </div>
             </div>
 
@@ -560,23 +629,20 @@
         }
 
         const tambahBtn = document.getElementById('tambahLayananBtn');
-if (tambahBtn) {
-    tambahBtn.addEventListener('click', () => {
-        // Arahkan ke halaman paket data
-        window.location.href = '/paket_data';
-    });
-}
+        if (tambahBtn) {
+            tambahBtn.addEventListener('click', () => {
+                window.location.href = '/paket_data';
+            });
+        }
 
-        // Event untuk lingkaran plus pada Sisa Pulsa
-// Event untuk lingkaran plus pada Sisa Pulsa
-const plusPulsaBtn = document.getElementById('plusPulsaBtn');
-if (plusPulsaBtn) {
-    plusPulsaBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        // Arahkan ke halaman tambah pulsa
-        window.location.href = '/tambah_pulsa';
-    });
-}
+        const plusPulsaBtn = document.getElementById('plusPulsaBtn');
+        if (plusPulsaBtn) {
+            plusPulsaBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = '/tambah_pulsa';
+            });
+        }
+
         const beliButtons = document.querySelectorAll('.beli-action');
         beliButtons.forEach(btn => {
             btn.addEventListener('click', (event) => {
@@ -608,7 +674,25 @@ if (plusPulsaBtn) {
                 block.style.borderColor = '#eef2f8';
             });
         });
-        
+
+        // ========== NOTIFIKASI SELAMAT DATANG (TOAST BAWAH) ==========
+        const welcomeMsg = '{{ session("welcome") }}';
+        const hasTopNotif = document.getElementById('topNotif') !== null;
+        if (welcomeMsg && welcomeMsg.trim() !== '' && !hasTopNotif) {
+            showToast(welcomeMsg, 'success');
+        }
+
+        // ========== AUTO HIDE TOP NOTIFICATION ==========
+        const topNotif = document.getElementById('topNotif');
+        if (topNotif) {
+            setTimeout(() => {
+                topNotif.classList.add('hide');
+                setTimeout(() => {
+                    if (topNotif.parentNode) topNotif.parentNode.removeChild(topNotif);
+                }, 300);
+            }, 3000);
+        }
+
         console.log('DarkForge-X | White Table Component Loaded — fully authorized simulation dashboard');
     })();
 </script>

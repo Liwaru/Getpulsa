@@ -239,7 +239,7 @@
         @if(session('level') == 1)
             <!-- Customer (Level 1) Menu -->
             <li>
-                <a href="/profile">
+                <a href="/profil">
                     <i class="bi bi-person-circle"></i> Profil
                 </a>
             </li>
@@ -282,6 +282,13 @@
                     <i class="bi bi-person-badge"></i> Data Admin
                 </a>
             </li>
+
+            <li>
+                <a href="/data-transaksi">
+                    <i class="bi bi-credit-card"></i> Data Transaksi
+                </a>
+            </li>
+
             <li>
                 <a href="/hak-akses">
                     <i class="bi bi-shield-lock"></i> Hak Akses
