@@ -162,4 +162,16 @@ public function beliKuota(Request $request, $id_produk)
     });
 
     return back()->with('success', 'Pembelian berhasil!');
-}}
+}
+
+public function tambah_pulsa()
+{
+    if (!session('id_user')) {
+        return redirect('/login');
+    }
+
+    // Anda bisa mengirim data lain yang diperlukan, misalnya daftar nominal pulsa
+    // Untuk sementara kita hanya mengembalikan view
+    return view('tambah_pulsa');
+}
+}

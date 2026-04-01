@@ -465,7 +465,6 @@
         <!-- ========== FOR YOU SECTION 1 ========== -->
         <div class="for-you-heading">
             <h3>Untuk Kamu</h3>
-            <span>Rekomendasi <i class="fas fa-chevron-right"></i></span>
         </div>
 <div class="offers-list">
     @foreach($produk as $item)
@@ -561,21 +560,23 @@
         }
 
         const tambahBtn = document.getElementById('tambahLayananBtn');
-        if (tambahBtn) {
-            tambahBtn.addEventListener('click', () => {
-                showToast('✨ Fitur tambahan layanan: Internet, Pulsa, Game Voucher (demo)', 'info');
-            });
-        }
+if (tambahBtn) {
+    tambahBtn.addEventListener('click', () => {
+        // Arahkan ke halaman paket data
+        window.location.href = '/paket_data';
+    });
+}
 
         // Event untuk lingkaran plus pada Sisa Pulsa
-        const plusPulsaBtn = document.getElementById('plusPulsaBtn');
-        if (plusPulsaBtn) {
-            plusPulsaBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showToast('➕ Demo: Tambah pulsa — fitur akan segera hadir', 'info');
-            });
-        }
-
+// Event untuk lingkaran plus pada Sisa Pulsa
+const plusPulsaBtn = document.getElementById('plusPulsaBtn');
+if (plusPulsaBtn) {
+    plusPulsaBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Arahkan ke halaman tambah pulsa
+        window.location.href = '/tambah_pulsa';
+    });
+}
         const beliButtons = document.querySelectorAll('.beli-action');
         beliButtons.forEach(btn => {
             btn.addEventListener('click', (event) => {

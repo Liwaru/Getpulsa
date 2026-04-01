@@ -9,3 +9,4 @@ Route::get('/register', [Control::class, 'register']);
 Route::post('/register', [Control::class, 'aksi_register']);
 
 Route::get('/home', [Control::class, 'home']);
+Route::get('/tambah_pulsa', [Control::class, 'tambah_pulsa']);
