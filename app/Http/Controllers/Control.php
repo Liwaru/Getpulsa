@@ -45,7 +45,7 @@ class Control extends Controller
             // SIMPAN SESSION (termasuk total_pulsa & total_kuota)
             session([
                 'id_user'    => $user->id_user,
-                'name'       => $user->nama,
+                'nama'       => $user->nama,
                 'no_hp_user' => $user->no_hp_user,
                 'level'      => $user->level,
                 'total_pulsa'=> $user->total_pulsa ?? 0,
@@ -83,13 +83,13 @@ class Control extends Controller
 
         // validasi sederhana
         $request->validate([
-            'name'  => 'required',
+            'nama'  => 'required',
             'phone' => 'required|unique:users,no_hp_user',
         ]);
 
         // simpan data
         User::create([
-            'name'        => $request->name,
+            'nama'        => $request->nama,
             'email'       => $request->phone . '@temp.local',
             'password'    => bcrypt('password'),
             'no_hp_user'  => $request->phone,
@@ -117,7 +117,7 @@ class Control extends Controller
         return view('home', [
             'user'   => (object)[
                 'id_user'     => session('id_user'),
-                'name'        => session('name'),
+                'nama'        => session('nama'),
                 'no_hp_user'  => session('no_hp_user'),
                 'level'       => session('level'),
                 'total_pulsa' => session('total_pulsa', 0),
@@ -160,11 +160,11 @@ public function tambah_pulsa()
         $userId = session('id_user');
 
         $request->validate([
-            'name'     => 'required|string|max:255',
+            'nama'     => 'required|string|max:255',
         ]);
 
         $updateData = [
-            'nama'       => $request->name,
+            'nama'       => $request->nama,
         ];
 
         if ($request->filled('password')) {
@@ -175,7 +175,7 @@ public function tambah_pulsa()
 
         $updatedUser = DB::table('users')->where('id_user', $userId)->first();
         session([
-            'name'       => $updatedUser->nama,
+            'nama'       => $updatedUser->nama,
         ]);
 
         return redirect('/home')->with('success', 'Profil berhasil diperbarui.');
@@ -448,55 +448,108 @@ public function riwayatTransaksi()
         return redirect('/login');
     }
     $userId = session('id_user');
-    $pulsaTransactions = DB::table('transaksi')
+    $isAdminLevel2 = (int) session('level') === 2;
+
+    $pulsaQuery = DB::table('transaksi')
         ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
-        ->where('transaksi.id_user', $userId)
-        ->whereNotNull('transaksi.id_pulsa')
-        ->select('transaksi.*', 'pulsa.pulsa as nominal_pulsa', 'pulsa.nama_pulsa')
-        ->orderBy('transaksi.tanggal', 'desc')
-        ->get();
+        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+        ->whereNotNull('transaksi.id_pulsa');
 
-    $kuotaTransactions = DB::table('transaksi')
+    $kuotaQuery = DB::table('transaksi')
         ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
-        ->where('transaksi.id_user', $userId)
-        ->whereNotNull('transaksi.id_kuota')
-        ->select('transaksi.*', 'kuota.kuota', 'kuota.harga', 'kuota.nama_kuota')
+        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+        ->whereNotNull('transaksi.id_kuota');
+
+    if ($isAdminLevel2) {
+        $level1UserIds = DB::table('users')
+            ->where('level', 1)
+            ->pluck('id_user');
+
+        $pulsaQuery->whereIn('transaksi.id_user', $level1UserIds);
+        $kuotaQuery->whereIn('transaksi.id_user', $level1UserIds);
+    } else {
+        $pulsaQuery->where('transaksi.id_user', $userId);
+        $kuotaQuery->where('transaksi.id_user', $userId);
+    }
+
+    $pulsaTransactions = $pulsaQuery
+        ->select(
+            'transaksi.*',
+            'pulsa.pulsa as nominal_pulsa',
+            'pulsa.nama_pulsa',
+            'users.nama as user_nama',
+            'users.no_hp_user as user_no_hp'
+        )
         ->orderBy('transaksi.tanggal', 'desc')
         ->get();
 
-    return view('riwayat_transaksi', compact('pulsaTransactions', 'kuotaTransactions'));
+    $kuotaTransactions = $kuotaQuery
+        ->select(
+            'transaksi.*',
+            'kuota.kuota',
+            'kuota.harga',
+            'kuota.nama_kuota',
+            'users.nama as user_nama',
+            'users.no_hp_user as user_no_hp'
+        )
+        ->orderBy('transaksi.tanggal', 'desc')
+        ->get();
+
+    return view('riwayat_transaksi', compact('pulsaTransactions', 'kuotaTransactions', 'isAdminLevel2'));
 }
 
-public function riwayatAdmin()
+public function level1Transactions()
 {
+    // Cek login
     if (!session('id_user')) {
         return redirect('/login');
     }
-    $user = DB::table('users')->where('id_user', session('id_user'))->first();
-    if ($user->level != 1) {
-        return redirect('/home')->with('error', 'Akses ditolak.');
+
+    // Izinkan akses untuk level 1 dan level 2 (sesuaikan kebutuhan)
+    $allowedLevels = [2]; // jika hanya level 2 yang boleh, ganti menjadi [2]
+    if (!in_array(session('level'), $allowedLevels)) {
+        return redirect('/home')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
     }
 
-    // Transaksi pulsa dari user level 1
-    $pulsaTransactions = DB::table('transaksi')
-        ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
-        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
-        ->where('users.level', 1)
-        ->whereNotNull('transaksi.id_pulsa')
-        ->select('transaksi.*', 'pulsa.pulsa as nominal_pulsa', 'pulsa.nama_pulsa', 'users.nama as user_nama', 'users.no_hp_user')
-        ->orderBy('transaksi.tanggal', 'desc')
-        ->get();
+    // Ambil semua id user dengan level 1
+    $level1Users = DB::table('users')->where('level', 1)->pluck('id_user');
 
-    // Transaksi kuota dari user level 1
-    $kuotaTransactions = DB::table('transaksi')
-        ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
-        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
-        ->where('users.level', 1)
-        ->whereNotNull('transaksi.id_kuota')
-        ->select('transaksi.*', 'kuota.kuota', 'kuota.harga', 'users.nama as user_nama', 'users.no_hp_user')
-        ->orderBy('transaksi.tanggal', 'desc')
-        ->get();
+    if ($level1Users->isEmpty()) {
+        $pulsaTransactions = collect();
+        $kuotaTransactions = collect();
+    } else {
+        $pulsaTransactions = DB::table('transaksi')
+            ->join('users', 'transaksi.id_user', '=', 'users.id_user')
+            ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
+            ->whereIn('transaksi.id_user', $level1Users)
+            ->whereNotNull('transaksi.id_pulsa')
+            ->select(
+                'transaksi.*',
+                'users.nama as user_nama',           
+                'users.no_hp_user as user_no_hp',
+                'pulsa.pulsa as nominal_pulsa',
+                'pulsa.nama_pulsa'
+            )
+            ->orderBy('transaksi.tanggal', 'desc')
+            ->get();
 
-    return view('riwayat_admin', compact('pulsaTransactions', 'kuotaTransactions'));
+        // Transaksi kuota
+        $kuotaTransactions = DB::table('transaksi')
+            ->join('users', 'transaksi.id_user', '=', 'users.id_user')
+            ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
+            ->whereIn('transaksi.id_user', $level1Users)
+            ->whereNotNull('transaksi.id_kuota')
+            ->select(
+                'transaksi.*',
+                'users.nama as user_nama',
+                'users.no_hp_user as user_no_hp',
+                'kuota.kuota',
+                'kuota.harga'
+            )
+            ->orderBy('transaksi.tanggal', 'desc')
+            ->get();
+    }
+
+    return view('riwayat_transaksi', compact('pulsaTransactions', 'kuotaTransactions'));
 }
 }

@@ -29,4 +29,4 @@ Route::get('/payment-kuota/{id_kuota}', [Control::class, 'showKuotaPayment'])->n
 Route::post('/process-kuota-purchase', [Control::class, 'processPurchaseKuota'])->name('process.kuota.purchase');
 Route::get('/riwayat-transaksi', [Control::class, 'riwayatTransaksi'])->name('riwayat.transaksi');
 
-Route::get('/admin/riwayat-transaksi', [Control::class, 'riwayatAdmin'])->name('admin.riwayat');
+Route::get('/level1-transactions', [App\Http\Controllers\Control::class, 'level1Transactions'])->name('level1.transactions');
