@@ -29,7 +29,7 @@
 
         <h4 class="text-center mb-4 fw-bold">Login</h4>
 
-        <form method="POST" action="/aksi_login">
+        <form method="POST" action="{{ url('/aksi_login') }}">
             @csrf
 
             <!-- No HP -->
