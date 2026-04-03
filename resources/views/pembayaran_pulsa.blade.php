@@ -3,14 +3,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Pembayaran Pulsa</title>
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        /* CSS sama seperti sebelumnya */
         * {
             margin: 0;
             padding: 0;
@@ -27,51 +24,48 @@
             justify-content: center;
         }
 
-        .white-dashboard {
-            max-width: 800px;
+        .payment-card {
             width: 100%;
-            margin: 2rem auto 0 auto;
-            background: #ffffff;
+            max-width: 720px;
+            margin-top: 2rem;
+            background: #fff;
             border-radius: 2rem;
             box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
             overflow: hidden;
         }
 
-        .dashboard-inner {
+        .payment-inner {
             padding: 2rem;
         }
 
-        .payment-header {
+        .payment-top {
             background: #f8fafd;
-            border-radius: 1.5rem;
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
             border: 1px solid #eef2f8;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-radius: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .phone-number {
+        .payment-title {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #1e2f41;
-        }
-
-        .phone-number i {
-            font-size: 1.3rem;
-            color: #c90000;
-        }
-
-        .amount {
             font-size: 1.2rem;
             font-weight: 700;
+            color: #1e2f41;
+            margin-bottom: 0.4rem;
+        }
+
+        .payment-title i {
             color: #c90000;
         }
 
+        .payment-subtitle {
+            color: #5e6f8d;
+            font-size: 0.95rem;
+        }
+
+<<<<<<< HEAD
         .method-title-main {
             font-size: 1.2rem;
             font-weight: 700;
@@ -173,33 +167,80 @@
             border: 1px solid #e2e8f0;
             border-radius: 0.75rem;
             font-family: 'Inter', sans-serif;
+=======
+        .payment-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-section,
+        .summary-section {
+            background: #fff;
+            border: 1px solid #edf2f7;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+        }
+
+        .section-heading {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e2f41;
+            margin-bottom: 1rem;
+        }
+
+        .field-label {
+            display: block;
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e2f41;
+            margin-bottom: 0.5rem;
         }
 
-        .summary-card {
-            background: #f8fafd;
-            border-radius: 1rem;
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border: 1px solid #eef2f8;
+        .field-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid #d9e2ec;
+            border-radius: 0.9rem;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .summary-item {
+        .field-input:focus {
+            border-color: #c90000;
+            box-shadow: 0 0 0 4px rgba(201, 0, 0, 0.08);
+        }
+
+        .field-help {
+            margin-top: 0.5rem;
+            font-size: 0.82rem;
+            color: #6b7c93;
+        }
+
+        .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: #5e6f8d;
+            gap: 1rem;
+            padding: 0.65rem 0;
+            color: #425466;
+            border-bottom: 1px solid #eef2f8;
+        }
+
+        .summary-row:last-of-type {
+            border-bottom: none;
         }
 
         .summary-total {
             display: flex;
             justify-content: space-between;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #e2e8f0;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dbe5f0;
+            font-size: 1.15rem;
+            font-weight: 800;
             color: #1e2f41;
         }
 
@@ -211,55 +252,61 @@
         }
 
         .btn-bayar {
-            background: #c90000;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.15s;
             width: 100%;
+            border: none;
+            border-radius: 999px;
+            background: #c90000;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.95rem 1.25rem;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
         .btn-bayar:hover {
             background: #a50000;
-        }
-
-        .hidden-group {
-            display: none;
+            transform: translateY(-1px);
         }
 
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
             }
-            .dashboard-inner {
-                padding: 1rem;
+
+            .payment-inner {
+                padding: 1.25rem;
             }
+<<<<<<< HEAD
             .method-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             .method-item img {
                 width: 40px;
                 height: 40px;
+=======
+
+            .summary-row,
+            .summary-total {
+                font-size: 0.95rem;
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             }
         }
     </style>
 </head>
 <body>
-<div class="white-dashboard">
-    <div class="dashboard-inner">
-        <div class="payment-header">
-            <div class="phone-number">
-                <i class="fas fa-phone-alt"></i>
-                <span>{{ $no_hp }}</span>
+<div class="payment-card">
+    <div class="payment-inner">
+        <div class="payment-top">
+            <div class="payment-title">
+                
+                <span>Pembayaran Pulsa</span>
             </div>
-            <div class="amount">
-                Rp{{ number_format($total, 0, ',', '.') }}
+            <div class="payment-subtitle">
+                Isi nomor tujuan pulsa lalu lanjutkan pembayaran.
             </div>
         </div>
+<<<<<<< HEAD
         <div class="method-title-main">Metode Pembayaran</div>
 
         <form
@@ -271,11 +318,15 @@
             data-qris-url="{{ route('payment.qris.create') }}"
             data-item-type="pulsa"
         >
+=======
+
+        <form class="payment-form" action="{{ route('process.payment') }}" method="POST">
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             @csrf
             <input type="hidden" name="id_pulsa" value="{{ $id_pulsa }}">
-            <input type="hidden" name="payment_method" id="paymentMethod" value="">
-            <input type="hidden" name="account_number" id="accountNumberInput">
+            <input type="hidden" name="payment_method" value="pulsa">
 
+<<<<<<< HEAD
             <div class="method-section">
                 <div class="section-title">
                     <i class="fas fa-qrcode" style="color:#c90000;"></i> QRIS
@@ -316,6 +367,35 @@
                     <span>Pulsa {{ number_format($nominal, 0, ',', '.') }}</span>
                     <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
                 </div>
+=======
+            <div class="form-section">
+                <div class="section-heading">Nomor Tujuan</div>
+                <label class="field-label" for="account_number">Nomor untuk isi pulsa</label>
+                <input
+                    class="field-input"
+                    type="text"
+                    id="account_number"
+                    name="account_number"
+                    value="{{ old('account_number', $no_hp) }}"
+                    placeholder="Masukkan nomor tujuan"
+                    inputmode="numeric"
+                    pattern="[0-9]+"
+                    required
+                >
+                <div class="field-help">Nomor ini akan digunakan sebagai tujuan pengisian pulsa.</div>
+            </div>
+
+            <div class="summary-section">
+                <div class="section-heading">Ringkasan Pembayaran</div>
+                <div class="summary-row">
+                    <span>Nominal Pulsa</span>
+                    <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Biaya Admin</span>
+                    <span>Rp{{ number_format($biaya_admin, 0, ',', '.') }}</span>
+                </div>
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
                 <div class="summary-total">
                     <span>Total Bayar</span>
                     <span>Rp{{ number_format($total, 0, ',', '.') }}</span>
@@ -330,6 +410,7 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 
 <script
     src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
@@ -496,6 +577,8 @@
         }
     });
 </script>
+=======
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
 </body>
 </html>
 @include('footer')

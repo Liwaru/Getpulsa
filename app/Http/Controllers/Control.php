@@ -113,12 +113,34 @@ class Control extends Controller
     public function home()
     {
         if (!session('id_user')) {
+<<<<<<< HEAD
             session()->flash('welcome', 'Selamat datang, ' . Auth::user()->name);
 
             return redirect('/login');
         }
 
         $this->refreshSessionBalances((int) session('id_user'));
+=======
+            return redirect('/login');
+        }
+
+        $user = DB::table('users')
+            ->where('id_user', session('id_user'))
+            ->first();
+
+        if (!$user) {
+            session()->flush();
+            return redirect('/login')->with('error', 'User tidak ditemukan.');
+        }
+
+        session([
+            'nama'        => $user->nama,
+            'no_hp_user'  => $user->no_hp_user,
+            'level'       => $user->level,
+            'total_pulsa' => $user->total_pulsa ?? 0,
+            'total_kuota' => $user->total_kuota ?? 0,
+        ]);
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
 
         $kuota = DB::table('kuota')
             ->whereIn('id_kuota', [5, 6])
@@ -127,6 +149,7 @@ class Control extends Controller
             ->get();
 
         return view('home', [
+<<<<<<< HEAD
             'user' => (object) [
                 'id_user' => session('id_user'),
                 'nama' => session('nama'),
@@ -136,6 +159,10 @@ class Control extends Controller
                 'total_kuota' => session('total_kuota', 0),
             ],
             'kuota' => $kuota,
+=======
+            'user'   => $user,
+            'kuota' => $kuota
+>>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
         ]);
     }
 

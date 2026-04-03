@@ -524,14 +524,14 @@
             <!-- Profile -->
             <div class="profile-row">
                 <div class="user-info">
-                    <div class="avatar">{{ strtoupper(substr(session('name'), 0, 1)) }}</div>
+                    <div class="avatar">{{ strtoupper(substr($user->nama ?? session('nama', 'U'), 0, 1)) }}</div>
                     <div class="user-text">
-                        <h2>{{ session('name') }}</h2>
+                        <h2>{{ $user->nama ?? session('nama') }}</h2>
                     </div>
                 </div>
                 <!-- Welcome message di sebelah kanan -->
                 <div class="welcome-message">
-                     Selamat datang, {{ session('name') }}
+                     Selamat datang, {{ $user->nama ?? session('nama') }}
                 </div>
             </div>
 
@@ -540,7 +540,7 @@
                 <div class="prabayar-left">
                     <i class="fas fa-phone-alt"></i>
                     <div>
-                        <div class="prabayar-number" id="phoneNumberDisplay">{{ session('phone') ?? session('no_hp_user') ?? 'Nomor tidak tersedia' }}</div>
+                        <div class="prabayar-number" id="phoneNumberDisplay">{{ $user->no_hp_user ?? session('no_hp_user') ?? 'Nomor tidak tersedia' }}</div>
                     </div>
                 </div>
                 <div class="copy-icon" id="copyPhoneBtn" title="salin nomor">
