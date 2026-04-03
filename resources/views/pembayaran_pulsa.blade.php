@@ -83,16 +83,16 @@
 
         .method-section {
             margin-bottom: 2rem;
-            background: #fefefe;
-            border-radius: 1rem;
-            padding: 1rem;
-            border: 1px solid #edf2f7;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+            border-radius: 1.25rem;
+            padding: 1.15rem;
+            border: 1px solid #e7edf5;
         }
 
         .method-section .section-title {
             font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.05rem;
             color: #1e2f41;
             display: flex;
             align-items: center;
@@ -102,38 +102,56 @@
         .method-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            gap: 0.9rem;
         }
 
         .method-item {
-            background: #f8fafd;
-            border: 1px solid #eef2f8;
-            border-radius: 1rem;
-            padding: 0.75rem;
+            background: linear-gradient(180deg, #f9fbff 0%, #f3f7fc 100%);
+            border: 1px solid #dfe8f2;
+            border-radius: 1.1rem;
+            padding: 0.95rem 0.75rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            min-height: 118px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .method-item.active {
             border-color: #c90000;
-            background: #fff0f0;
-            box-shadow: 0 2px 8px rgba(201, 0, 0, 0.1);
+            background: linear-gradient(180deg, #fff4f4 0%, #ffeaea 100%);
+            box-shadow: 0 10px 24px rgba(201, 0, 0, 0.14);
+            transform: translateY(-2px);
+        }
+
+        .method-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 47, 65, 0.1);
         }
 
         .method-item img {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             object-fit: contain;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.65rem;
             border-radius: 12px;
         }
 
         .method-item span {
             display: block;
+            font-weight: 700;
+            font-size: 0.84rem;
+            color: #1e2f41;
+        }
+
+        .method-item .method-subtitle {
+            font-size: 0.72rem;
             font-weight: 500;
-            font-size: 0.8rem;
+            color: #6b7b8f;
+            margin-top: 0.22rem;
         }
 
         .input-group {
@@ -185,6 +203,13 @@
             color: #1e2f41;
         }
 
+        .small-note {
+            font-size: 0.7rem;
+            color: #b90000;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
         .btn-bayar {
             background: #c90000;
             border: none;
@@ -213,6 +238,9 @@
             .dashboard-inner {
                 padding: 1rem;
             }
+            .method-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .method-item img {
                 width: 40px;
                 height: 40px;
@@ -232,14 +260,34 @@
                 Rp{{ number_format($total, 0, ',', '.') }}
             </div>
         </div>
-
         <div class="method-title-main">Metode Pembayaran</div>
 
-        <form id="paymentForm" action="{{ route('process.payment') }}" method="POST">
+        <form
+            id="paymentForm"
+            action="{{ route('process.payment') }}"
+            method="POST"
+            data-finish-url="{{ route('midtrans.finish') }}"
+            data-redirect-url="{{ url('/home') }}"
+            data-qris-url="{{ route('payment.qris.create') }}"
+            data-item-type="pulsa"
+        >
             @csrf
             <input type="hidden" name="id_pulsa" value="{{ $id_pulsa }}">
             <input type="hidden" name="payment_method" id="paymentMethod" value="">
             <input type="hidden" name="account_number" id="accountNumberInput">
+
+            <div class="method-section">
+                <div class="section-title">
+                    <i class="fas fa-qrcode" style="color:#c90000;"></i> QRIS
+                </div>
+                <div class="method-grid" id="qrisGrid">
+                    <div class="method-item" data-type="qris" data-name="qris">
+                        <i class="fas fa-qrcode" style="font-size: 2rem; color:#c90000; margin-bottom: 0.5rem;"></i>
+                        <span>QRIS</span>
+                        <div class="method-subtitle">Scan QR</div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Dompet Digital -->
             <div class="method-section" id="ewalletSection">
@@ -260,35 +308,6 @@
                         <span>DANA</span>
                     </div>
                 </div>
-                <div class="input-group" id="ewalletInputGroup">
-                    <label for="ewalletNumber">Nomor E-wallet</label>
-                    <input type="text" id="ewalletNumber" autocomplete="off">
-                </div>
-            </div>
-
-            <!-- Virtual Account -->
-            <div class="method-section" id="vaSection">
-                <div class="section-title">
-                    <i class="fas fa-university" style="color:#c90000;"></i> Virtual Account (VA)
-                </div>
-                <div class="method-grid" id="vaGrid">
-                    <div class="method-item" data-type="va" data-name="mandiri">
-                        <img src="{{ asset('images/mandiri.png') }}" alt="Mandiri">
-                        <span>Mandiri</span>
-                    </div>
-                    <div class="method-item" data-type="va" data-name="bca">
-                        <img src="{{ asset('images/bca.png') }}" alt="BCA">
-                        <span>BCA</span>
-                    </div>
-                    <div class="method-item" data-type="va" data-name="bni">
-                        <img src="{{ asset('images/bni.png') }}" alt="BNI">
-                        <span>BNI</span>
-                    </div>
-                </div>
-                <div class="input-group" id="vaInputGroup">
-                    <label for="vaNumber">Nomor Rekening</label>
-                    <input type="text" id="vaNumber" autocomplete="off">
-                </div>
             </div>
 
             <!-- Ringkasan Pembayaran -->
@@ -297,126 +316,184 @@
                     <span>Pulsa {{ number_format($nominal, 0, ',', '.') }}</span>
                     <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
                 </div>
-                <div class="summary-item">
-                    <span>Biaya Admin</span>
-                    <span>Rp{{ number_format($biaya_admin, 0, ',', '.') }}</span>
-                </div>
                 <div class="summary-total">
                     <span>Total Bayar</span>
                     <span>Rp{{ number_format($total, 0, ',', '.') }}</span>
                 </div>
             </div>
 
-            <button type="submit" class="btn-bayar">Bayar Sekarang</button>
+            <button type="submit" class="btn-bayar" id="payButton">Bayar Sekarang</button>
         </form>
+
+        <div class="small-note">
+            <i class="fas fa-shield-alt"></i> Pembayaran terpercaya • Powered by Midtrans
+        </div>
     </div>
 </div>
 
+<script
+    src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+    data-client-key="{{ $midtrans_client_key }}"
+></script>
 <script>
     // DOM elements
+    const paymentForm = document.getElementById('paymentForm');
+    const qrisItems = document.querySelectorAll('#qrisGrid .method-item');
     const ewalletItems = document.querySelectorAll('#ewalletGrid .method-item');
-    const vaItems = document.querySelectorAll('#vaGrid .method-item');
-    const ewalletInputGroup = document.getElementById('ewalletInputGroup');
-    const vaInputGroup = document.getElementById('vaInputGroup');
-    const ewalletInput = document.getElementById('ewalletNumber');
-    const vaInput = document.getElementById('vaNumber');
     const paymentMethodHidden = document.getElementById('paymentMethod');
     const accountNumberHidden = document.getElementById('accountNumberInput');
-    const ewalletLabel = document.querySelector('#ewalletInputGroup label'); // untuk mengubah teks label
+    const payButton = document.getElementById('payButton');
 
     let selectedType = null;
     let selectedName = null;
 
-    // Initially hide both input groups
-    ewalletInputGroup.classList.add('hidden-group');
-    vaInputGroup.classList.add('hidden-group');
-
     function clearActive() {
+        qrisItems.forEach(item => item.classList.remove('active'));
         ewalletItems.forEach(item => item.classList.remove('active'));
-        vaItems.forEach(item => item.classList.remove('active'));
     }
 
     function updateHidden() {
-        if (selectedType && selectedName) {
-            paymentMethodHidden.value = selectedType + '_' + selectedName;
+        if (selectedType === 'qris') {
+            paymentMethodHidden.value = 'qris';
+        } else if (selectedName) {
+            paymentMethodHidden.value = 'e-wallet_' + selectedName;
         } else {
             paymentMethodHidden.value = '';
         }
 
-        if (selectedType === 'e-wallet') {
-            accountNumberHidden.value = ewalletInput.value;
-        } else if (selectedType === 'va') {
-            accountNumberHidden.value = vaInput.value;
-        } else {
-            accountNumberHidden.value = '';
-        }
+        accountNumberHidden.value = '';
     }
 
-    function handleMethodClick(method, type, name) {
+    function handleQrisClick(method) {
         clearActive();
         method.classList.add('active');
-        selectedType = type;
-        selectedName = name;
-
-        if (type === 'e-wallet') {
-            ewalletInputGroup.classList.remove('hidden-group');
-            vaInputGroup.classList.add('hidden-group');
-
-            // Ubah label sesuai e-wallet yang dipilih
-            let labelText = '';
-            let placeholderText = '';
-            if (name === 'gopay') {
-                labelText = 'Nomor GoPay';
-            } else if (name === 'ovo') {
-                labelText = 'Nomor OVO';
-            } else if (name === 'dana') {
-                labelText = 'Nomor DANA';
-            }
-            ewalletLabel.innerText = labelText;
-            ewalletInput.placeholder = placeholderText;
-        } else {
-            ewalletInputGroup.classList.add('hidden-group');
-            vaInputGroup.classList.remove('hidden-group');
-            // Untuk VA, label tetap "Nomor Rekening", bisa juga diubah jika diperlukan
-            // const vaLabel = document.querySelector('#vaInputGroup label');
-            // vaLabel.innerText = 'Nomor Rekening ' + name.toUpperCase();
-        }
-
+        selectedType = 'qris';
+        selectedName = 'qris';
         updateHidden();
     }
 
-    // Attach click events for e-wallet methods
+    function handleMethodClick(method, name) {
+        clearActive();
+        method.classList.add('active');
+        selectedType = 'e-wallet';
+        selectedName = name;
+        updateHidden();
+    }
+
+    qrisItems.forEach(method => {
+        method.addEventListener('click', () => {
+            handleQrisClick(method);
+        });
+    });
+
     ewalletItems.forEach(method => {
         method.addEventListener('click', () => {
-            handleMethodClick(method, 'e-wallet', method.getAttribute('data-name'));
+            handleMethodClick(method, method.getAttribute('data-name'));
         });
     });
 
-    // Attach click events for VA methods
-    vaItems.forEach(method => {
-        method.addEventListener('click', () => {
-            handleMethodClick(method, 'va', method.getAttribute('data-name'));
-        });
-    });
+    async function syncMidtransResult(orderId) {
+        if (!orderId) {
+            return;
+        }
 
-    // Update hidden when input changes
-    ewalletInput.addEventListener('input', updateHidden);
-    vaInput.addEventListener('input', updateHidden);
+        await fetch(paymentForm.dataset.finishUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ order_id: orderId })
+        });
+    }
+
+    function redirectAfterPayment(message) {
+        if (message) {
+            alert(message);
+        }
+        window.location.href = paymentForm.dataset.redirectUrl;
+    }
 
     // Form validation before submit
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
-        if (!selectedType || !selectedName) {
+    paymentForm.addEventListener('submit', async function(e) {
+        if (!selectedName) {
             e.preventDefault();
             alert('Silakan pilih metode pembayaran terlebih dahulu.');
             return;
         }
-        if ((selectedType === 'e-wallet' && ewalletInput.value.trim() === '') ||
-            (selectedType === 'va' && vaInput.value.trim() === '')) {
-            e.preventDefault();
-            alert('Silakan isi nomor ' + (selectedType === 'e-wallet' ? ewalletLabel.innerText.toLowerCase() : 'rekening') + ' Anda.');
-            return;
-        }
+        e.preventDefault();
         updateHidden();
+
+        payButton.disabled = true;
+        payButton.innerText = 'Memproses...';
+
+        try {
+            const targetUrl = selectedType === 'qris'
+                ? paymentForm.dataset.qrisUrl
+                : paymentForm.action;
+
+            const payload = selectedType === 'qris'
+                ? (() => {
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('payment_type', paymentForm.dataset.itemType);
+                    formData.append('item_id', '{{ $id_pulsa }}');
+                    return formData;
+                })()
+                : new FormData(paymentForm);
+
+            const response = await fetch(targetUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: payload
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Gagal membuat transaksi Midtrans.');
+            }
+
+            if (selectedType === 'qris') {
+                if (!result.redirect_url) {
+                    throw new Error('Halaman QRIS tidak berhasil dibuat.');
+                }
+                window.location.href = result.redirect_url;
+                return;
+            }
+
+            if (!result.snap_token) {
+                throw new Error('Snap token tidak tersedia.');
+            }
+
+            window.snap.pay(result.snap_token, {
+                onSuccess: async function(response) {
+                    await syncMidtransResult(response.order_id || result.order_id);
+                    redirectAfterPayment('Pembayaran berhasil.');
+                },
+                onPending: async function(response) {
+                    await syncMidtransResult(response.order_id || result.order_id);
+                    redirectAfterPayment('Pembayaran sedang diproses.');
+                },
+                onError: function(response) {
+                    console.error(response);
+                    alert('Pembayaran gagal diproses oleh Midtrans.');
+                },
+                onClose: function() {
+                    redirectAfterPayment('Popup pembayaran ditutup sebelum transaksi selesai.');
+                }
+            });
+        } catch (error) {
+            alert(error.message || 'Terjadi kesalahan saat memproses pembayaran.');
+        } finally {
+            payButton.disabled = false;
+            payButton.innerText = 'Bayar Sekarang';
+        }
     });
 </script>
 </body>
