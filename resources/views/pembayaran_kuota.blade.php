@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Pembayaran Paket Data</title>
+    <title>Pembayaran Pulsa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
@@ -65,7 +65,6 @@
             font-size: 0.95rem;
         }
 
-<<<<<<< HEAD
         .method-title-main {
             font-size: 1.2rem;
             font-weight: 700;
@@ -148,88 +147,20 @@
             margin-top: 0.22rem;
         }
 
-        .input-group {
-            margin-top: 0.5rem;
-            transition: all 0.2s;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            color: #1e2f41;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 0.6rem 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            font-family: 'Inter', sans-serif;
-=======
-        .payment-form {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .form-section,
-        .summary-section {
-            background: #fff;
-            border: 1px solid #edf2f7;
+        .summary-card {
+            background: #f8fafd;
+            border: 1px solid #eef2f8;
             border-radius: 1.25rem;
             padding: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        .section-heading {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e2f41;
-            margin-bottom: 1rem;
-        }
-
-        .field-label {
-            display: block;
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1e2f41;
-            margin-bottom: 0.5rem;
-        }
-
-        .field-input {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            border: 1px solid #d9e2ec;
-            border-radius: 0.9rem;
-            font-size: 1rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .field-input:focus {
-            border-color: #c90000;
-            box-shadow: 0 0 0 4px rgba(201, 0, 0, 0.08);
-        }
-
-        .field-help {
-            margin-top: 0.5rem;
-            font-size: 0.82rem;
-            color: #6b7c93;
-        }
-
-        .summary-row {
+        .summary-item {
             display: flex;
             justify-content: space-between;
-            gap: 1rem;
-            padding: 0.65rem 0;
+            padding: 0.5rem 0;
             color: #425466;
             border-bottom: 1px solid #eef2f8;
-        }
-
-        .summary-row:last-of-type {
-            border-bottom: none;
         }
 
         .summary-total {
@@ -277,19 +208,14 @@
             .payment-inner {
                 padding: 1.25rem;
             }
-<<<<<<< HEAD
+
             .method-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
             .method-item img {
                 width: 40px;
                 height: 40px;
-=======
-
-            .summary-row,
-            .summary-total {
-                font-size: 0.95rem;
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             }
         }
     </style>
@@ -299,30 +225,29 @@
     <div class="payment-inner">
         <div class="payment-top">
             <div class="payment-title">
-                
-                <span>Pembayaran Paket Data</span>
+                <span>Pembayaran Pulsa</span>
             </div>
             <div class="payment-subtitle">
-                Masukkan nomor tujuan untuk pembelian paket data ini.
+                Isi nomor tujuan pulsa lalu lanjutkan pembayaran.
             </div>
         </div>
-<<<<<<< HEAD
+
         <div class="method-title-main">Metode Pembayaran</div>
 
         <form
             id="paymentForm"
-            action="{{ route('process.kuota.purchase') }}"
+            action="{{ route('process.payment') }}"
             method="POST"
             data-finish-url="{{ route('midtrans.finish') }}"
             data-redirect-url="{{ url('/home') }}"
             data-qris-url="{{ route('payment.qris.create') }}"
-            data-item-type="kuota"
+            data-item-type="pulsa"
         >
             @csrf
-            <input type="hidden" name="id_kuota" value="{{ $id_kuota }}">
-            <input type="hidden" name="payment_method" id="paymentMethod" value="">
-            <input type="hidden" name="account_number" id="accountNumberInput">
+            <input type="hidden" name="id_pulsa" value="{{ $id_pulsa }}">
+            <input type="hidden" name="payment_method" value="pulsa">
 
+            <!-- QRIS -->
             <div class="method-section">
                 <div class="section-title">
                     <i class="fas fa-qrcode" style="color:#c90000;"></i> QRIS
@@ -360,41 +285,8 @@
             <!-- Ringkasan Pembayaran -->
             <div class="summary-card">
                 <div class="summary-item">
-                    <span>Paket Data {{ $kuota }}</span>
-=======
-
-        <form class="payment-form" action="{{ route('process.kuota.purchase') }}" method="POST">
-            @csrf
-            <input type="hidden" name="id_kuota" value="{{ $id_kuota }}">
-            <input type="hidden" name="payment_method" value="kuota">
-
-            <div class="form-section">
-                <div class="section-heading">Nomor Tujuan</div>
-                <label class="field-label" for="account_number">Nomor untuk isi kuota</label>
-                <input
-                    class="field-input"
-                    type="text"
-                    id="account_number"
-                    name="account_number"
-                    value="{{ old('account_number', $no_hp) }}"
-                    placeholder="Masukkan nomor tujuan"
-                    inputmode="numeric"
-                    pattern="[0-9]+"
-                    required
-                >
-                <div class="field-help">Nomor ini akan digunakan sebagai tujuan pengaktifan paket data.</div>
-            </div>
-
-            <div class="summary-section">
-                <div class="section-heading">Ringkasan Pembayaran</div>
-                <div class="summary-row">
-                    <span>Paket Data</span>
-                    <span>{{ $kuota }}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Harga</span>
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
-                    <span>Rp{{ number_format($harga, 0, ',', '.') }}</span>
+                    <span>Pulsa {{ number_format($nominal, 0, ',', '.') }}</span>
+                    <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-total">
                     <span>Total Bayar</span>
@@ -410,7 +302,6 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 
 <script
     src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
@@ -440,7 +331,6 @@
         } else {
             paymentMethodHidden.value = '';
         }
-
         accountNumberHidden.value = '';
     }
 
@@ -461,22 +351,15 @@
     }
 
     qrisItems.forEach(method => {
-        method.addEventListener('click', () => {
-            handleQrisClick(method);
-        });
+        method.addEventListener('click', () => handleQrisClick(method));
     });
 
     ewalletItems.forEach(method => {
-        method.addEventListener('click', () => {
-            handleMethodClick(method, method.getAttribute('data-name'));
-        });
+        method.addEventListener('click', () => handleMethodClick(method, method.getAttribute('data-name')));
     });
 
     async function syncMidtransResult(orderId) {
-        if (!orderId) {
-            return;
-        }
-
+        if (!orderId) return;
         await fetch(paymentForm.dataset.finishUrl, {
             method: 'POST',
             headers: {
@@ -489,9 +372,7 @@
     }
 
     function redirectAfterPayment(message) {
-        if (message) {
-            alert(message);
-        }
+        if (message) alert(message);
         window.location.href = paymentForm.dataset.redirectUrl;
     }
 
@@ -517,7 +398,7 @@
                     const formData = new FormData();
                     formData.append('_token', '{{ csrf_token() }}');
                     formData.append('payment_type', paymentForm.dataset.itemType);
-                    formData.append('item_id', '{{ $id_kuota }}');
+                    formData.append('item_id', '{{ $id_pulsa }}');
                     return formData;
                 })()
                 : new FormData(paymentForm);
@@ -539,16 +420,12 @@
             }
 
             if (selectedType === 'qris') {
-                if (!result.redirect_url) {
-                    throw new Error('Halaman QRIS tidak berhasil dibuat.');
-                }
+                if (!result.redirect_url) throw new Error('Halaman QRIS tidak berhasil dibuat.');
                 window.location.href = result.redirect_url;
                 return;
             }
 
-            if (!result.snap_token) {
-                throw new Error('Snap token tidak tersedia.');
-            }
+            if (!result.snap_token) throw new Error('Snap token tidak tersedia.');
 
             window.snap.pay(result.snap_token, {
                 onSuccess: async function(response) {
@@ -575,8 +452,6 @@
         }
     });
 </script>
-=======
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
 </body>
 </html>
 @include('footer')

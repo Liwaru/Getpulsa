@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Riwayat Transaksi</title>
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -49,7 +47,6 @@
             padding-left: 0.75rem;
         }
 
-        /* Tab styles */
         .tab-container {
             display: flex;
             align-items: center;
@@ -58,6 +55,7 @@
             border-bottom: 1px solid #eef2f8;
             width: 100%;
         }
+
         .tab-btn {
             background: none;
             border: none;
@@ -69,9 +67,11 @@
             transition: 0.2s;
             position: relative;
         }
+
         .tab-btn.active {
             color: #c90000;
         }
+
         .tab-btn.active::after {
             content: '';
             position: absolute;
@@ -81,30 +81,34 @@
             height: 2px;
             background: #c90000;
         }
+
         .tab-btn:hover {
             color: #a50000;
         }
 
-        /* Table styles */
         .transaksi-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
         }
+
         .transaksi-table th,
         .transaksi-table td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #edf2f7;
         }
+
         .transaksi-table th {
             background: #f8fafd;
             font-weight: 600;
             color: #1e2f41;
         }
+
         .transaksi-table td {
             color: #2c3e4e;
         }
+
         .status-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -112,10 +116,22 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
+
         .status-berhasil {
             background: #e8f5e9;
             color: #2e7d32;
         }
+
+        .method-badge {
+            display: inline-block;
+            padding: 0.2rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #eef2f8;
+            color: #1e2f41;
+        }
+
         .no-data {
             text-align: center;
             padding: 2rem;
@@ -198,7 +214,6 @@
             background: #e5e9f2;
             color: #23374d;
         }
-
     </style>
 </head>
 <body>
@@ -206,7 +221,6 @@
     <div class="dashboard-inner">
         <div class="page-title">Riwayat Transaksi</div>
 
-        <!-- Tab buttons -->
         <div class="tab-container">
             <button class="tab-btn active" id="tabPulsa">Transaksi Pulsa</button>
             <button class="tab-btn" id="tabKuota">Transaksi Kuota</button>
@@ -233,6 +247,7 @@
                         <th>Nama</th>
                         <th>No HP</th>
                         <th>Nominal</th>
+                        <th>Metode</th>
                         <th>Produk</th>
                         <th>Status</th>
                     </tr>
@@ -249,12 +264,19 @@
                             <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
                             <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
                             <td>Rp{{ number_format($trans->pulsa_masuk, 0, ',', '.') }}</td>
+                            <td>
+                                @if($trans->payment_channel)
+                                    <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
+                                @else
+                                    <span style="color:#8f9bb3;">-</span>
+                                @endif
+                            </td>
                             <td>{{ $trans->nama_pulsa ?? 'Pulsa ' . $trans->nominal_pulsa }}</td>
                             <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="no-data">Belum ada transaksi pulsa</td>
+                            <td colspan="7" class="no-data">Belum ada transaksi pulsa</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -270,6 +292,7 @@
                         <th>Nama</th>
                         <th>No HP</th>
                         <th>Nominal</th>
+                        <th>Metode</th>
                         <th>Produk</th>
                         <th>Status</th>
                     </tr>
@@ -286,12 +309,19 @@
                             <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
                             <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
                             <td>Rp{{ number_format($trans->pulsa_keluar, 0, ',', '.') }}</td>
+                            <td>
+                                @if($trans->payment_channel)
+                                    <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
+                                @else
+                                    <span style="color:#8f9bb3;">-</span>
+                                @endif
+                            </td>
                             <td>{{ $trans->nama_kuota ?? 'Paket Data ' . $trans->kuota }}</td>
                             <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="no-data">Belum ada transaksi kuota</td>
+                            <td colspan="7" class="no-data">Belum ada transaksi kuota</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -301,7 +331,6 @@
 </div>
 
 <script>
-    // Tab switching logic
     const tabPulsa = document.getElementById('tabPulsa');
     const tabKuota = document.getElementById('tabKuota');
     const pulsaContainer = document.getElementById('pulsaContainer');
@@ -341,26 +370,22 @@
         return value.replace(/[^\d]/g, '');
     }
 
-    function filterKuotaRows() {
-        const tanggal = filterTanggalKuota.value.trim();
-        const nominal = normalizeNominal(filterNominalKuota.value.trim());
-
-        kuotaRows.forEach((row) => {
+    function filterPulsaRows() {
+        const tanggal = filterTanggalPulsa.value.trim();
+        const nominal = normalizeNominal(filterNominalPulsa.value.trim());
+        pulsaRows.forEach((row) => {
             const matchTanggal = !tanggal || row.dataset.tanggal === tanggal;
             const matchNominal = !nominal || row.dataset.nominal.includes(nominal);
-
             row.style.display = matchTanggal && matchNominal ? '' : 'none';
         });
     }
 
-    function filterPulsaRows() {
-        const tanggal = filterTanggalPulsa.value.trim();
-        const nominal = normalizeNominal(filterNominalPulsa.value.trim());
-
-        pulsaRows.forEach((row) => {
+    function filterKuotaRows() {
+        const tanggal = filterTanggalKuota.value.trim();
+        const nominal = normalizeNominal(filterNominalKuota.value.trim());
+        kuotaRows.forEach((row) => {
             const matchTanggal = !tanggal || row.dataset.tanggal === tanggal;
             const matchNominal = !nominal || row.dataset.nominal.includes(nominal);
-
             row.style.display = matchTanggal && matchNominal ? '' : 'none';
         });
     }
@@ -368,17 +393,13 @@
     function resetPulsaFilters() {
         filterTanggalPulsa.value = '';
         filterNominalPulsa.value = '';
-        pulsaRows.forEach((row) => {
-            row.style.display = '';
-        });
+        pulsaRows.forEach((row) => { row.style.display = ''; });
     }
 
     function resetKuotaFilters() {
         filterTanggalKuota.value = '';
         filterNominalKuota.value = '';
-        kuotaRows.forEach((row) => {
-            row.style.display = '';
-        });
+        kuotaRows.forEach((row) => { row.style.display = ''; });
     }
 
     searchPulsaBtn.addEventListener('click', filterPulsaRows);

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Data Pembeli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,31 +15,30 @@
         }
 
         body {
-            background: linear-gradient(145deg, #eef2f6 0%, #dde5ee 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #e9eef3 0%, #dce2ea 100%);
+            font-family: 'Inter', system-ui, sans-serif;
             min-height: 100vh;
-            padding: 1.5rem 1.5rem 2rem;
+            padding: 1.5rem;
             display: flex;
             justify-content: center;
-            align-items: center;  /* Menengahkan vertikal (opsional) */
+            align-items: flex-start;
         }
 
-        /* Kontainer utama: tengah horizontal, lebar maksimal */
         .page-shell {
             width: 100%;
-            max-width: 1160px;
-            margin: 0 auto;       /* Tengah horizontal */
+            max-width: 900px;
+            margin: 2rem auto 0;
         }
 
         .page-card {
             background: #ffffff;
-            border-radius: 1.5rem;
-            box-shadow: 0 22px 40px -18px rgba(15, 23, 42, 0.18);
-            border: 1px solid rgba(201, 0, 0, 0.08);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
         }
 
         .page-inner {
-            padding: 1.45rem 1.45rem 1.3rem;
+            padding: 2rem;
         }
 
         .page-toolbar {
@@ -47,90 +47,103 @@
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .page-title {
-            display: flex;
-            align-items: center;
-            font-size: 1.55rem;
-            font-weight: 800;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: #c90000;
-            letter-spacing: -0.02em;
+            border-left: 4px solid #c90000;
+            padding-left: 0.75rem;
         }
 
         .search-form {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
             flex-wrap: wrap;
-            margin-left: auto;
         }
 
         .search-label {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #8f0000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e2f41;
+            white-space: nowrap;
         }
 
         .search-input {
-            width: 280px;
+            width: 240px;
             max-width: 100%;
-            padding: 0.85rem 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e5b8b8;
-            font-size: 0.95rem;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.65rem;
+            border: 1px solid #d0d7e2;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
             outline: none;
-            background: #fffdfd;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .search-input:focus {
-            border-color: #cf1c1c;
-            box-shadow: 0 0 0 3px rgba(207, 28, 28, 0.14);
+            border-color: #c90000;
+            box-shadow: 0 0 0 3px rgba(201, 0, 0, 0.08);
         }
 
         .search-button {
-            background: linear-gradient(180deg, #d90000 0%, #b50000 100%);
+            background: #c90000;
             color: #fff;
             border: none;
-            border-radius: 0.75rem;
-            padding: 0.85rem 1.15rem;
-            font-weight: 700;
+            border-radius: 0.65rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s;
+            white-space: nowrap;
         }
 
         .search-button:hover {
-            background: linear-gradient(180deg, #c30000 0%, #980000 100%);
+            background: #a50000;
         }
 
-        /* Pembungkus tabel dengan tinggi minimal */
         .table-wrap {
-            border-radius: 1.2rem;
+            border-radius: 1rem;
             overflow: hidden;
-            border: 1px solid #efc6c6;
-            background: #fff;
-            min-height: 400px;   /* Mencegah tabel menyusut ke bawah */
+            border: 1px solid #edf2f7;
         }
 
         .user-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .user-table thead th {
-            background: linear-gradient(180deg, #df0000 0%, #b90000 100%);
+            background: #c90000;
             color: #fff;
             text-align: left;
-            padding: 1.05rem 1.05rem;
-            font-size: 0.96rem;
-            font-weight: 700;
+            padding: 0.9rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
+        .user-table thead th:nth-child(1) { width: 80px; }
+        .user-table thead th:nth-child(2) { width: auto; }
+        .user-table thead th:nth-child(3) { width: 200px; }
+
         .user-table tbody td {
-            padding: 1.05rem 1.05rem;
-            border-bottom: 1px solid #f3dddd;
-            color: #32465a;
-            font-size: 0.95rem;
+            padding: 0.9rem 1.25rem;
+            border-bottom: 1px solid #f0f4f9;
+            font-size: 0.92rem;
+            color: #2c3e4e;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .user-table tbody tr:last-child td {
@@ -141,45 +154,71 @@
             background: #fff7f7;
         }
 
+        .user-table tbody tr:nth-child(even) {
+            background: #fafbfd;
+        }
+
+        .user-table tbody tr:nth-child(even):hover {
+            background: #fff7f7;
+        }
+
+        .col-no {
+            color: #8f9bb3;
+            font-weight: 500;
+            text-align: center;
+        }
+
         .user-name {
-            font-weight: 700;
-            color: #8f0000;
+            font-weight: 600;
+            color: #1e2f41;
+        }
+
+        .nohp-text {
+            color: #5e7a9a;
+            font-size: 0.9rem;
         }
 
         .empty-state {
-            padding: 2rem 1rem;
+            padding: 3rem 1rem;
             text-align: center;
-            color: #7b8794;
+            color: #8f9bb3;
+            font-size: 0.95rem;
         }
 
-        /* Responsif */
+        .empty-state i {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: #d0d7e2;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
-                align-items: flex-start; /* di HP, vertikal tidak perlu tengah */
             }
             .page-shell {
-                margin: 0;
+                margin-top: 1rem;
             }
             .page-inner {
-                padding: 1rem;
+                padding: 1.25rem;
             }
-            .page-title {
-                font-size: 1.3rem;
+            .page-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
             }
             .search-form {
                 width: 100%;
-                margin-left: 0;
             }
             .search-input {
                 width: 100%;
+                flex: 1;
             }
             .table-wrap {
                 overflow-x: auto;
-                min-height: 300px; /* sedikit dikurangi di HP */
+                min-height: 300px;
             }
             .user-table {
-                min-width: 640px;
+                min-width: 480px;
             }
         }
     </style>
@@ -211,28 +250,30 @@
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th><i class="fas fa-user"></i> Nama</th>
-                            <th><i class="fas fa-phone"></i> No HP</th>
+                            <th style="text-align:center;">No</th>
+                            <th><i class="fas fa-user" style="margin-right:6px;"></i>Nama</th>
+                            <th><i class="fas fa-phone" style="margin-right:6px;"></i>No HP</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($users as $index => $user)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td class="col-no">{{ $index + 1 }}</td>
                                 <td class="user-name">{{ $user->nama }}</td>
-                                <td>{{ $user->no_hp_user }}</td>
+                                <td class="nohp-text">{{ $user->no_hp_user }}</td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="3" class="empty-state">
-                                    <i class="fas fa-users-slash"></i> tidak ada pembeli dengan nama tersebut
+                                    <i class="fas fa-users-slash"></i>
+                                    Tidak ada pembeli dengan nama tersebut
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 </div>

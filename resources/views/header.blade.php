@@ -275,6 +275,11 @@
                 </a>
             </li>
         @elseif(session('level') == 3)
+            <li>
+                <a href="/paket_data">
+                    <i class="bi bi-box"></i> Paket Data
+                </a>
+            </li>
             <!-- Super Admin (Level 3) Menu -->
             <li>
                 <a href="/data-user">
@@ -287,9 +292,9 @@
                 </a>
             </li>
 
-            <li>
-                <a href="/data-transaksi">
-                    <i class="bi bi-credit-card"></i> Data Transaksi
+             <li>
+                <a href="/riwayat-transaksi">
+                     <i class="bi bi-file-earmark-text"></i> Data Transaksi
                 </a>
             </li>
 

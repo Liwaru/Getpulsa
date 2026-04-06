@@ -65,7 +65,6 @@
             font-size: 0.95rem;
         }
 
-<<<<<<< HEAD
         .method-title-main {
             font-size: 1.2rem;
             font-weight: 700;
@@ -167,30 +166,6 @@
             border: 1px solid #e2e8f0;
             border-radius: 0.75rem;
             font-family: 'Inter', sans-serif;
-=======
-        .payment-form {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .form-section,
-        .summary-section {
-            background: #fff;
-            border: 1px solid #edf2f7;
-            border-radius: 1.25rem;
-            padding: 1.25rem;
-        }
-
-        .section-heading {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e2f41;
-            margin-bottom: 1rem;
-        }
-
-        .field-label {
-            display: block;
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             font-size: 0.9rem;
             font-weight: 600;
             color: #1e2f41;
@@ -219,17 +194,20 @@
             color: #6b7c93;
         }
 
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 0.65rem 0;
-            color: #425466;
-            border-bottom: 1px solid #eef2f8;
+        .summary-card {
+            background: #f8fafd;
+            border: 1px solid #eef2f8;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        .summary-row:last-of-type {
-            border-bottom: none;
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            color: #425466;
+            border-bottom: 1px solid #eef2f8;
         }
 
         .summary-total {
@@ -277,19 +255,14 @@
             .payment-inner {
                 padding: 1.25rem;
             }
-<<<<<<< HEAD
+
             .method-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
             .method-item img {
                 width: 40px;
                 height: 40px;
-=======
-
-            .summary-row,
-            .summary-total {
-                font-size: 0.95rem;
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             }
         }
     </style>
@@ -299,14 +272,13 @@
     <div class="payment-inner">
         <div class="payment-top">
             <div class="payment-title">
-                
                 <span>Pembayaran Pulsa</span>
             </div>
             <div class="payment-subtitle">
                 Isi nomor tujuan pulsa lalu lanjutkan pembayaran.
             </div>
         </div>
-<<<<<<< HEAD
+
         <div class="method-title-main">Metode Pembayaran</div>
 
         <form
@@ -318,15 +290,12 @@
             data-qris-url="{{ route('payment.qris.create') }}"
             data-item-type="pulsa"
         >
-=======
-
-        <form class="payment-form" action="{{ route('process.payment') }}" method="POST">
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
             @csrf
             <input type="hidden" name="id_pulsa" value="{{ $id_pulsa }}">
-            <input type="hidden" name="payment_method" value="pulsa">
+            <input type="hidden" id="paymentMethod" name="payment_method" value="">
+            <input type="hidden" id="accountNumberInput" name="account_number" value="">
 
-<<<<<<< HEAD
+            <!-- QRIS -->
             <div class="method-section">
                 <div class="section-title">
                     <i class="fas fa-qrcode" style="color:#c90000;"></i> QRIS
@@ -367,35 +336,6 @@
                     <span>Pulsa {{ number_format($nominal, 0, ',', '.') }}</span>
                     <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
                 </div>
-=======
-            <div class="form-section">
-                <div class="section-heading">Nomor Tujuan</div>
-                <label class="field-label" for="account_number">Nomor untuk isi pulsa</label>
-                <input
-                    class="field-input"
-                    type="text"
-                    id="account_number"
-                    name="account_number"
-                    value="{{ old('account_number', $no_hp) }}"
-                    placeholder="Masukkan nomor tujuan"
-                    inputmode="numeric"
-                    pattern="[0-9]+"
-                    required
-                >
-                <div class="field-help">Nomor ini akan digunakan sebagai tujuan pengisian pulsa.</div>
-            </div>
-
-            <div class="summary-section">
-                <div class="section-heading">Ringkasan Pembayaran</div>
-                <div class="summary-row">
-                    <span>Nominal Pulsa</span>
-                    <span>Rp{{ number_format($nominal, 0, ',', '.') }}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Biaya Admin</span>
-                    <span>Rp{{ number_format($biaya_admin, 0, ',', '.') }}</span>
-                </div>
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
                 <div class="summary-total">
                     <span>Total Bayar</span>
                     <span>Rp{{ number_format($total, 0, ',', '.') }}</span>
@@ -410,14 +350,12 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 
 <script
     src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
     data-client-key="{{ $midtrans_client_key }}"
 ></script>
 <script>
-    // DOM elements
     const paymentForm = document.getElementById('paymentForm');
     const qrisItems = document.querySelectorAll('#qrisGrid .method-item');
     const ewalletItems = document.querySelectorAll('#ewalletGrid .method-item');
@@ -441,7 +379,6 @@
         } else {
             paymentMethodHidden.value = '';
         }
-
         accountNumberHidden.value = '';
     }
 
@@ -462,22 +399,15 @@
     }
 
     qrisItems.forEach(method => {
-        method.addEventListener('click', () => {
-            handleQrisClick(method);
-        });
+        method.addEventListener('click', () => handleQrisClick(method));
     });
 
     ewalletItems.forEach(method => {
-        method.addEventListener('click', () => {
-            handleMethodClick(method, method.getAttribute('data-name'));
-        });
+        method.addEventListener('click', () => handleMethodClick(method, method.getAttribute('data-name')));
     });
 
     async function syncMidtransResult(orderId) {
-        if (!orderId) {
-            return;
-        }
-
+        if (!orderId) return;
         await fetch(paymentForm.dataset.finishUrl, {
             method: 'POST',
             headers: {
@@ -490,13 +420,10 @@
     }
 
     function redirectAfterPayment(message) {
-        if (message) {
-            alert(message);
-        }
+        if (message) alert(message);
         window.location.href = paymentForm.dataset.redirectUrl;
     }
 
-    // Form validation before submit
     paymentForm.addEventListener('submit', async function(e) {
         if (!selectedName) {
             e.preventDefault();
@@ -541,16 +468,12 @@
             }
 
             if (selectedType === 'qris') {
-                if (!result.redirect_url) {
-                    throw new Error('Halaman QRIS tidak berhasil dibuat.');
-                }
+                if (!result.redirect_url) throw new Error('Halaman QRIS tidak berhasil dibuat.');
                 window.location.href = result.redirect_url;
                 return;
             }
 
-            if (!result.snap_token) {
-                throw new Error('Snap token tidak tersedia.');
-            }
+            if (!result.snap_token) throw new Error('Snap token tidak tersedia.');
 
             window.snap.pay(result.snap_token, {
                 onSuccess: async function(response) {
@@ -577,8 +500,6 @@
         }
     });
 </script>
-=======
->>>>>>> 7bd2c3e125f53e6831b16c2377895a9958330159
 </body>
 </html>
 @include('footer')
