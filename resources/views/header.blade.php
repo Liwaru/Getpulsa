@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Getpulsa</title>
 
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -42,7 +42,7 @@
             height: 50px;
             object-fit: contain;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            border-radius: 14px; /* ujung logo melengkung seperti aplikasi */
+            border-radius: 14px;
         }
         
         .sidebar-brand-text {
@@ -143,38 +143,37 @@
             text-align: center;
         }
         
-        /* Konten utama: ditempatkan di sebelah sidebar tanpa balok putih */
+        /* =============================================
+           CONTENT AREA — FIXED
+           ============================================= */
         .content-area {
             margin-left: 280px;
             padding: 20px;
             min-height: 100vh;
-            background-color: transparent; /* tidak ada latar putih */
+            background-color: #f5f7fa;
         }
-        
+
+        /* DIHAPUS: Jangan pernah pakai ini — merusak semua child element!
+        .content-area * {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        */
+        /* ============================================= */
+
         body {
-            background-color: #f5f7fa; /* latar belakang halaman tetap */
+            background-color: #f5f7fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
         
         /* Flash Messages */
         .alert {
             margin: 20px 0;
             border-radius: 10px;
-        }
-        
-        /* Pastikan tidak ada elemen yang menampilkan latar putih di dalam content-area */
-        .content-area * {
-            background-color: transparent !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
-        
-        /* Kecuali pesan alert, biarkan tetap terlihat */
-        .content-area .alert {
-            background-color: var(--bs-alert-bg, #cfe2ff) !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-            border: 1px solid var(--bs-alert-border-color, #b6d4fe) !important;
         }
         
         /* Mobile Responsive */
@@ -236,67 +235,129 @@
     
     <!-- Navigation Menu -->
     <ul class="sidebar-nav">
+        @php
+            // Helper function untuk check permission
+            $hasPermission = function($menuKey) {
+                $permissions = session('permissions', []);
+                return in_array($menuKey, $permissions);
+            };
+        @endphp
+
         @if(session('level') == 1)
             <!-- Customer (Level 1) Menu -->
+            @if($hasPermission('profil') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/profil">
                     <i class="bi bi-person-circle"></i> Profil
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('paket_data') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/paket_data">
                     <i class="bi bi-box"></i> Paket Data
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('data_transaksi') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/riwayat-transaksi">
                     <i class="bi bi-file-earmark-text"></i> Riwayat Transaksi
                 </a>
             </li>
+            @endif
         @elseif(session('level') == 2)
-        <li>
+            <!-- Admin (Level 2) Menu -->
+            @if($hasPermission('profil') || count(session('permissions', [])) === 0)
+            <li>
                 <a href="/profil">
                     <i class="bi bi-person-circle"></i> Profil
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('paket_data') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/paket_data">
                     <i class="bi bi-box"></i> Paket Data
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('data_user') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/data-user">
                     <i class="bi bi-people-fill"></i> Data User
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('data_transaksi') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/riwayat-transaksi">
                      <i class="bi bi-file-earmark-text"></i> Data Transaksi
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('statistik_produk') || count(session('permissions', [])) === 0)
+            <li>
+                <a href="/statistik-produk">
+                    <i class="bi bi-bar-chart"></i> Statistik Produk
+                </a>
+            </li>
+            @endif
         @elseif(session('level') == 3)
+            <!-- Super Admin (Level 3) Menu -->
+            @if($hasPermission('paket_data') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/paket_data">
                     <i class="bi bi-box"></i> Paket Data
                 </a>
             </li>
-            <!-- Super Admin (Level 3) Menu -->
+            @endif
+
+            @if($hasPermission('data_user') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/data-user">
                     <i class="bi bi-people-fill"></i> Data User
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('data_admin') || count(session('permissions', [])) === 0)
             <li>
                 <a href="/data-admin">
                     <i class="bi bi-person-badge"></i> Data Admin
                 </a>
             </li>
+            @endif
 
-             <li>
+             @if($hasPermission('data_transaksi') || count(session('permissions', [])) === 0)
+            <li>
                 <a href="/riwayat-transaksi">
                      <i class="bi bi-file-earmark-text"></i> Data Transaksi
                 </a>
             </li>
+            @endif
+
+            @if($hasPermission('laporan_penjualan') || count(session('permissions', [])) === 0)
+            <li>
+                <a href="/laporan-penjualan">
+                    <i class="bi bi-graph-up"></i> Laporan Penjualan
+                </a>
+            </li>
+            @endif
+
+            @if($hasPermission('statistik_produk') || count(session('permissions', [])) === 0)
+            <li>
+                <a href="/statistik-produk">
+                    <i class="bi bi-bar-chart"></i> Statistik Produk
+                </a>
+            </li>
+            @endif
 
             <li>
                 <a href="/hak-akses">
@@ -326,9 +387,7 @@
     </ul>
 </aside>
 
-<!-- Konten utama: tanpa wrapper putih -->
-<div class="content-area">
-</div>
+<!-- Konten utama -->
 
 <script>
     // Script untuk sidebar active state

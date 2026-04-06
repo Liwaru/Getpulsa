@@ -56,6 +56,12 @@ class Control extends Controller
             ->first();
 
         if ($user) {
+            // Load permissions untuk user berdasarkan level mereka
+            $permissionsRaw = DB::table('permissions')
+                ->where('level', $user->level)
+                ->pluck('menu_key')
+                ->toArray();
+
             session([
                 'id_user' => $user->id_user,
                 'nama' => $user->nama,
@@ -63,6 +69,7 @@ class Control extends Controller
                 'level' => $user->level,
                 'total_pulsa' => $user->total_pulsa ?? 0,
                 'total_kuota' => $user->total_kuota ?? 0,
+                'permissions' => $permissionsRaw, // Simpan permissions di session
             ]);
 
             session()->flash('welcome', 'Selamat datang, ' . $user->nama);
@@ -125,12 +132,19 @@ public function home()
         return redirect('/login')->with('error', 'User tidak ditemukan.');
     }
 
+    // Load permissions untuk user berdasarkan level mereka
+    $permissionsRaw = DB::table('permissions')
+        ->where('level', $user->level)
+        ->pluck('menu_key')
+        ->toArray();
+
     session([
         'nama'        => $user->nama,
         'no_hp_user'  => $user->no_hp_user,
         'level'       => $user->level,
         'total_pulsa' => $user->total_pulsa ?? 0,
         'total_kuota' => $user->total_kuota ?? 0,
+        'permissions' => $permissionsRaw, // Update permissions di session
     ]);
 
     $kuota = DB::table('kuota')
@@ -638,62 +652,66 @@ public function home()
         }
     }
 
-    public function riwayatTransaksi()
-    {
-        if (!session('id_user')) {
-            return redirect('/login');
-        }
-
-        $userId = session('id_user');
-        $isAdminLevel2 = (int) session('level') === 2;
-
-        $pulsaQuery = DB::table('transaksi')
-            ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
-            ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
-            ->whereNotNull('transaksi.id_pulsa');
-
-        $kuotaQuery = DB::table('transaksi')
-            ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
-            ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
-            ->whereNotNull('transaksi.id_kuota');
-
-        if ($isAdminLevel2) {
-            $level1UserIds = DB::table('users')
-                ->where('level', 1)
-                ->pluck('id_user');
-
-            $pulsaQuery->whereIn('transaksi.id_user', $level1UserIds);
-            $kuotaQuery->whereIn('transaksi.id_user', $level1UserIds);
-        } else {
-            $pulsaQuery->where('transaksi.id_user', $userId);
-            $kuotaQuery->where('transaksi.id_user', $userId);
-        }
-
-        $pulsaTransactions = $pulsaQuery
-            ->select(
-                'transaksi.*',
-                'pulsa.pulsa as nominal_pulsa',
-                'pulsa.nama_pulsa',
-                'users.nama as user_nama',
-                'users.no_hp_user as user_no_hp'
-            )
-            ->orderBy('transaksi.tanggal', 'desc')
-            ->get();
-
-        $kuotaTransactions = $kuotaQuery
-            ->select(
-                'transaksi.*',
-                'kuota.kuota',
-                'kuota.harga',
-                'kuota.nama_kuota',
-                'users.nama as user_nama',
-                'users.no_hp_user as user_no_hp'
-            )
-            ->orderBy('transaksi.tanggal', 'desc')
-            ->get();
-
-        return view('riwayat_transaksi', compact('pulsaTransactions', 'kuotaTransactions', 'isAdminLevel2'));
+public function riwayatTransaksi()
+{
+    if (!session('id_user')) {
+        return redirect('/login');
     }
+
+    $userId = session('id_user');
+    $level = (int) session('level');
+
+    // Admin (level 2) dan Superadmin (level 3) bisa lihat semua transaksi user level 1
+    $showAllLevel1 = in_array($level, [2, 3], true);
+
+    $pulsaQuery = DB::table('transaksi')
+        ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
+        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+        ->whereNotNull('transaksi.id_pulsa');
+
+    $kuotaQuery = DB::table('transaksi')
+        ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
+        ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+        ->whereNotNull('transaksi.id_kuota');
+
+    if ($showAllLevel1) {
+        $level1UserIds = DB::table('users')
+            ->where('level', 1)
+            ->pluck('id_user');
+
+        $pulsaQuery->whereIn('transaksi.id_user', $level1UserIds);
+        $kuotaQuery->whereIn('transaksi.id_user', $level1UserIds);
+    } else {
+        // User level 1 hanya lihat transaksinya sendiri
+        $pulsaQuery->where('transaksi.id_user', $userId);
+        $kuotaQuery->where('transaksi.id_user', $userId);
+    }
+
+    $pulsaTransactions = $pulsaQuery
+        ->select(
+            'transaksi.*',
+            'pulsa.pulsa as nominal_pulsa',
+            'pulsa.nama_pulsa',
+            'users.nama as user_nama',
+            'users.no_hp_user as user_no_hp'
+        )
+        ->orderBy('transaksi.tanggal', 'desc')
+        ->get();
+
+    $kuotaTransactions = $kuotaQuery
+        ->select(
+            'transaksi.*',
+            'kuota.kuota',
+            'kuota.harga',
+            'kuota.nama_kuota',
+            'users.nama as user_nama',
+            'users.no_hp_user as user_no_hp'
+        )
+        ->orderBy('transaksi.tanggal', 'desc')
+        ->get();
+
+    return view('riwayat_transaksi', compact('pulsaTransactions', 'kuotaTransactions'));
+}
 
 public function level1Transactions()
 {
@@ -790,6 +808,41 @@ public function level1Transactions()
 
         return view('data_user', [
             'users' => $users,
+            'search' => $search,
+        ]);
+    }
+
+    public function dataAdmin(Request $request)
+    {
+        if (!session('id_user')) {
+            return redirect('/login');
+        }
+
+        // Pastikan hanya superadmin/admin yang bisa mengakses halaman ini
+        $allowedLevels = [3]; // misal: 2=admin, 3=superadmin
+        if (!in_array((int) session('level'), $allowedLevels, true)) {
+            return redirect('/home')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        $search = trim((string) $request->get('search', ''));
+
+        // Ambil user dengan level admin (level = 2)
+        $adminsQuery = DB::table('users')
+            ->where('level', 2)   // ← ganti dari 1 menjadi 2 (atau level admin Anda)
+            ->select('id_user', 'nama', 'no_hp_user')
+            ->orderBy('nama', 'asc');
+
+        if ($search !== '') {
+            $adminsQuery->where(function ($query) use ($search) {
+                $query->where('nama', 'like', '%' . $search . '%')
+                      ->orWhere('no_hp_user', 'like', '%' . $search . '%');
+            });
+        }
+
+        $admins = $adminsQuery->get();
+
+        return view('data_admin', [   // nama view sesuai file blade
+            'admins' => $admins,
             'search' => $search,
         ]);
     }
@@ -1104,4 +1157,392 @@ public function level1Transactions()
                 ->increment('total_kuota', $jumlahKuota);
         }
     }
+
+    public function hakAkses()
+    {
+        if ((int) session('level') !== 3) {
+            abort(403, 'Akses hanya untuk superadmin.');
+        }
+
+        // Level yang bisa diatur: admin (2) dan superadmin (3)
+        $levels = [
+            2 => 'Admin',
+            3 => 'Superadmin',
+        ];
+
+        // Daftar menu yang bisa diatur hak aksesnya
+        $menus = [
+            'paket_data',
+            'data_user',
+            'data_admin',
+            'data_transaksi',
+            'laporan_penjualan',
+        ];
+
+        // Ambil data permission dari database
+        $permissionsRaw = DB::table('permissions')->get();
+
+        // Ubah ke bentuk array [level][menu] = true
+        $permissions = [];
+        foreach ($permissionsRaw as $perm) {
+            $permissions[$perm->level][$perm->menu_key] = true;
+        }
+
+        return view('hak_akses', compact('levels', 'menus', 'permissions'));
+    }
+
+    // Menyimpan perubahan hak akses
+    public function updateHakAkses(Request $request)
+    {
+        if ((int) session('level') !== 3) {
+            abort(403);
+        }
+
+        $permissions = $request->input('permissions', []);
+
+        // Hapus semua data permission lama
+        DB::table('permissions')->truncate();
+
+        // Simpan yang baru
+        foreach ($permissions as $levelId => $menus) {
+            foreach ($menus as $menu) {
+                DB::table('permissions')->insert([
+                    'level' => $levelId,
+                    'menu_key' => $menu,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        // Reload permissions untuk current user di session
+        $currentUserLevel = (int) session('level');
+        $permissionsRaw = DB::table('permissions')
+            ->where('level', $currentUserLevel)
+            ->pluck('menu_key')
+            ->toArray();
+
+        session(['permissions' => $permissionsRaw]);
+
+        return redirect()->back()->with('success', 'Hak akses berhasil diperbarui.');
+    }
+
+    // ===== LAPORAN PENJUALAN =====
+
+    public function laporanPenjualan(Request $request)
+    {
+        if (!session('id_user')) {
+            return redirect('/login');
+        }
+
+        // Set default period ke bulanan
+        $period = $request->get('period', 'bulanan');
+        $type = $request->get('type', 'pulsa'); // pulsa atau kuota
+
+        // Validasi input
+        if (!in_array($period, ['harian', 'mingguan', 'bulanan', 'tahunan'])) {
+            $period = 'bulanan';
+        }
+        if (!in_array($type, ['pulsa', 'kuota'])) {
+            $type = 'pulsa';
+        }
+
+        // Get laporan data
+        $laporan = $this->getLaporanData($type, $period);
+
+        return view('laporan_penjualan', compact('laporan', 'period', 'type'));
+    }
+
+    public function getLaporanData($type, $period)
+    {
+        $query = DB::table('transaksi')
+            ->where('status', 'berhasil'); // Status enum di database
+
+        // Filter berdasarkan tipe (pulsa atau kuota)
+        if ($type === 'pulsa') {
+            $query->whereNotNull('transaksi.id_pulsa');
+        } else {
+            $query->whereNotNull('transaksi.id_kuota');
+        }
+
+        // Tambah informasi dari tabel terkait
+        $query->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
+            ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
+            ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+            ->select(
+                'transaksi.id_transaksi',
+                'transaksi.id_user',
+                'transaksi.id_pulsa',
+                'transaksi.id_kuota',
+                'transaksi.tanggal',
+                'transaksi.status',
+                DB::raw('COALESCE(pulsa.pulsa, kuota.kuota) as item_name'),
+                DB::raw('COALESCE(pulsa.harga, kuota.harga) as total_biaya'),
+                'users.nama'
+            );
+
+        // Kelompok berdasarkan period
+        switch ($period) {
+            case 'harian':
+                $query->whereDate('transaksi.tanggal', today());
+                $groupBy = 'date';
+                break;
+            case 'mingguan':
+                $query->whereBetween('transaksi.tanggal', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ]);
+                $groupBy = 'week';
+                break;
+            case 'bulanan':
+                $query->whereYear('transaksi.tanggal', now()->year)
+                    ->whereMonth('transaksi.tanggal', now()->month);
+                $groupBy = 'date';
+                break;
+            case 'tahunan':
+                $query->whereYear('transaksi.tanggal', now()->year);
+                $groupBy = 'month';
+                break;
+            default:
+                $groupBy = 'date';
+        }
+
+        $transactions = $query->orderBy('transaksi.tanggal', 'desc')->get();
+
+        // Hitung statistik
+        $totalPenjualan = $transactions->count();
+        $totalBiaya = $transactions->sum('total_biaya');
+        $rataRataBiaya = $totalPenjualan > 0 ? $totalBiaya / $totalPenjualan : 0;
+
+        // Kelompokkan data untuk chart
+        $chartData = $this->groupTransactionsByPeriod($transactions, $period);
+
+        return [
+            'transactions' => $transactions,
+            'totalPenjualan' => $totalPenjualan,
+            'totalBiaya' => $totalBiaya,
+            'rataRataBiaya' => $rataRataBiaya,
+            'chartData' => $chartData,
+        ];
+    }
+
+    private function groupTransactionsByPeriod($transactions, $period)
+    {
+        $grouped = [];
+
+        foreach ($transactions as $transaction) {
+            $date = \Carbon\Carbon::parse($transaction->tanggal);
+
+            switch ($period) {
+                case 'harian':
+                    $key = $date->format('H:00'); // Jam
+                    $label = $key;
+                    break;
+                case 'mingguan':
+                    $key = $date->format('l'); // Hari
+                    $label = $key;
+                    break;
+                case 'bulanan':
+                    $key = $date->format('Y-m-d');
+                    $label = $date->format('d/m');
+                    break;
+                case 'tahunan':
+                    $key = $date->format('Y-m');
+                    $label = $date->format('M');
+                    break;
+                default:
+                    $key = $date->format('Y-m-d');
+                    $label = $key;
+            }
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'label' => $label,
+                    'count' => 0,
+                    'total' => 0,
+                ];
+            }
+
+            $grouped[$key]['count']++;
+            $grouped[$key]['total'] += $transaction->total_biaya;
+        }
+
+        // Sort by key untuk urutan yang konsisten
+        if (in_array($period, ['harian', 'mingguan', 'tahunan'])) {
+            ksort($grouped);
+        } else {
+            // Untuk bulanan, sort by tanggal
+            $grouped = array_values($grouped);
+        }
+
+        return array_values($grouped);
+    }
+
+    public function statistikProduk(Request $request)
+    {
+        if (!session('id_user')) {
+            return redirect('/login');
+        }
+
+        $tipe = $request->get('tipe', 'pulsa'); // pulsa, kuota, atau best-seller
+        
+        // Validasi input
+        if (!in_array($tipe, ['pulsa', 'kuota', 'best-seller'])) {
+            $tipe = 'pulsa';
+        }
+
+        $statistik = $this->getStatistikData($tipe);
+        
+        // Ambil daftar transaksi lengkap dari database
+        $transaksi = DB::table('transaksi')
+            ->leftJoin('users', 'transaksi.id_user', '=', 'users.id_user')
+            ->leftJoin('pulsa', 'transaksi.id_pulsa', '=', 'pulsa.id_pulsa')
+            ->leftJoin('kuota', 'transaksi.id_kuota', '=', 'kuota.id_kuota')
+            ->select(
+                'transaksi.id_transaksi',
+                'transaksi.tanggal',
+                'users.nama',
+                'users.no_hp_user',
+                'pulsa.pulsa',
+                'pulsa.harga as harga_pulsa',
+                'kuota.kuota',
+                'kuota.harga as harga_kuota',
+                'transaksi.status',
+                'transaksi.payment_method',
+                'transaksi.payment_channel',
+                DB::raw('COALESCE(pulsa.harga, kuota.harga) as harga')
+            )
+            ->orderBy('transaksi.tanggal', 'desc')
+            ->get();
+
+        return view('statistik_produk', compact('statistik', 'tipe', 'transaksi'));
+    }
+
+    private function getStatistikData($tipe)
+    {
+        if ($tipe === 'pulsa') {
+            return $this->getStatistikPulsa();
+        } elseif ($tipe === 'kuota') {
+            return $this->getStatistikKuota();
+        } else {
+            return $this->getStatistikBestSeller();
+        }
+    }
+
+    private function getStatistikPulsa()
+    {
+        // Statistik jumlah terjual dan revenue dari pulsa
+        $pulsas = DB::table('pulsa')
+            ->leftJoin('transaksi', 'pulsa.id_pulsa', '=', 'transaksi.id_pulsa')
+            ->select(
+                'pulsa.id_pulsa',
+                'pulsa.pulsa',
+                'pulsa.harga',
+                DB::raw('COUNT(transaksi.id_transaksi) as total_terjual'),
+                DB::raw('SUM(CASE WHEN transaksi.status = "berhasil" THEN 1 ELSE 0 END) as total_berhasil'),
+                DB::raw('COALESCE(SUM(CASE WHEN transaksi.status = "berhasil" THEN pulsa.harga ELSE 0 END), 0) as total_revenue')
+            )
+            ->groupBy('pulsa.id_pulsa', 'pulsa.pulsa', 'pulsa.harga')
+            ->orderBy('total_terjual', 'asc')
+            ->get();
+
+        // Hitung total dan statistik
+        $totalTerjual = $pulsas->sum('total_terjual');
+        $totalBerhasil = $pulsas->sum('total_berhasil');
+        $totalRevenue = $pulsas->sum('total_revenue');
+        $rataRataTerjual = $pulsas->count() > 0 ? number_format($totalTerjual / $pulsas->count(), 2) : 0;
+
+        return [
+            'produk' => $pulsas,
+            'total_terjual' => $totalTerjual,
+            'total_berhasil' => $totalBerhasil,
+            'total_revenue' => $totalRevenue,
+            'rata_rata_terjual' => $rataRataTerjual,
+            'total_produk' => $pulsas->count(),
+        ];
+    }
+
+    private function getStatistikKuota()
+    {
+        // Statistik jumlah terjual dan revenue dari kuota
+        $kuotas = DB::table('kuota')
+            ->leftJoin('transaksi', 'kuota.id_kuota', '=', 'transaksi.id_kuota')
+            ->select(
+                'kuota.id_kuota',
+                'kuota.kuota',
+                'kuota.harga',
+                DB::raw('COUNT(transaksi.id_transaksi) as total_terjual'),
+                DB::raw('SUM(CASE WHEN transaksi.status = "berhasil" THEN 1 ELSE 0 END) as total_berhasil'),
+                DB::raw('COALESCE(SUM(CASE WHEN transaksi.status = "berhasil" THEN kuota.harga ELSE 0 END), 0) as total_revenue')
+            )
+            ->groupBy('kuota.id_kuota', 'kuota.kuota', 'kuota.harga')
+            ->orderBy('total_terjual', 'asc')
+            ->get();
+
+        // Hitung total dan statistik
+        $totalTerjual = $kuotas->sum('total_terjual');
+        $totalBerhasil = $kuotas->sum('total_berhasil');
+        $totalRevenue = $kuotas->sum('total_revenue');
+        $rataRataTerjual = $kuotas->count() > 0 ? number_format($totalTerjual / $kuotas->count(), 2) : 0;
+
+        return [
+            'produk' => $kuotas,
+            'total_terjual' => $totalTerjual,
+            'total_berhasil' => $totalBerhasil,
+            'total_revenue' => $totalRevenue,
+            'rata_rata_terjual' => $rataRataTerjual,
+            'total_produk' => $kuotas->count(),
+        ];
+    }
+
+    private function getStatistikBestSeller()
+    {
+        // Produk paling laku - gabungan pulsa dan kuota
+        $bestSellerPulsa = DB::table('pulsa')
+            ->leftJoin('transaksi', 'pulsa.id_pulsa', '=', 'transaksi.id_pulsa')
+            ->select(
+                'pulsa.id_pulsa as id_produk',
+                'pulsa.pulsa as nama_produk',
+                DB::raw('"pulsa" as tipe_produk'),
+                'pulsa.harga',
+                DB::raw('COUNT(transaksi.id_transaksi) as total_terjual'),
+                DB::raw('SUM(CASE WHEN transaksi.status = "berhasil" THEN 1 ELSE 0 END) as total_berhasil'),
+                DB::raw('COALESCE(SUM(CASE WHEN transaksi.status = "berhasil" THEN pulsa.harga ELSE 0 END), 0) as total_revenue')
+            )
+            ->groupBy('pulsa.id_pulsa', 'pulsa.pulsa', 'pulsa.harga');
+
+        $bestSellerKuota = DB::table('kuota')
+            ->leftJoin('transaksi', 'kuota.id_kuota', '=', 'transaksi.id_kuota')
+            ->select(
+                'kuota.id_kuota as id_produk',
+                'kuota.kuota as nama_produk',
+                DB::raw('"kuota" as tipe_produk'),
+                'kuota.harga',
+                DB::raw('COUNT(transaksi.id_transaksi) as total_terjual'),
+                DB::raw('SUM(CASE WHEN transaksi.status = "berhasil" THEN 1 ELSE 0 END) as total_berhasil'),
+                DB::raw('COALESCE(SUM(CASE WHEN transaksi.status = "berhasil" THEN kuota.harga ELSE 0 END), 0) as total_revenue')
+            )
+            ->groupBy('kuota.id_kuota', 'kuota.kuota', 'kuota.harga');
+
+        $bestSeller = $bestSellerPulsa
+            ->union($bestSellerKuota)
+            ->orderBy('total_terjual', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Hitung total statistik
+        $totalTerjual = $bestSeller->sum('total_terjual');
+        $totalBerhasil = $bestSeller->sum('total_berhasil');
+        $totalRevenue = $bestSeller->sum('total_revenue');
+
+        return [
+            'produk' => $bestSeller,
+            'total_terjual' => $totalTerjual,
+            'total_berhasil' => $totalBerhasil,
+            'total_revenue' => $totalRevenue,
+            'rata_rata_terjual' => $bestSeller->count() > 0 ? number_format($totalTerjual / $bestSeller->count(), 2) : 0,
+            'total_produk' => $bestSeller->count(),
+        ];
+    }
 }
+

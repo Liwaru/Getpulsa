@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Data Pembeli</title>
+    <title>Data Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
@@ -228,17 +228,17 @@
     <div class="page-card">
         <div class="page-inner">
             <div class="page-toolbar">
-                <div class="page-title">Data Pembeli</div>
+                <div class="page-title">Data Admin</div>
 
-                <form class="search-form" method="GET" action="{{ route('data.user') }}">
-                    <label class="search-label" for="searchUser">Nama / No HP :</label>
+                <form class="search-form" method="GET" action="{{ route('data.admin') }}">
+                    <label class="search-label" for="searchAdmin">Nama / No HP :</label>
                     <input
                         class="search-input"
                         type="text"
                         name="search"
-                        id="searchUser"
+                        id="searchAdmin"
                         value="{{ $search }}"
-                        placeholder="Cari nama atau no hp pembeli..."
+                        placeholder="Cari nama atau no hp admin..."
                     >
                     <button type="submit" class="search-button">
                         <i class="fas fa-search"></i> Cari
@@ -251,22 +251,22 @@
                     <thead>
                         <tr>
                             <th style="text-align:center;">No</th>
-                            <th><i class="fas fa-user" style="margin-right:6px;"></i>Nama</th>
+                            <th><i class="fas fa-user-shield" style="margin-right:6px;"></i>Nama</th>
                             <th><i class="fas fa-phone" style="margin-right:6px;"></i>No HP</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($users as $index => $user)
+                        @forelse($admins as $index => $admin)
                             <tr>
                                 <td class="col-no">{{ $index + 1 }}</td>
-                                <td class="user-name">{{ $user->nama }}</td>
-                                <td class="nohp-text">{{ $user->no_hp_user }}</td>
+                                <td class="user-name">{{ $admin->nama }}</td>
+                                <td class="nohp-text">{{ $admin->no_hp_user }}</td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="3" class="empty-state">
                                     <i class="fas fa-users-slash"></i>
-                                    Tidak ada pembeli dengan nama tersebut
+                                    Tidak ada admin dengan nama/HP tersebut
                                 </td>
                             </tr>
                         @endforelse

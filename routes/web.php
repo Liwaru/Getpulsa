@@ -11,14 +11,18 @@ Route::get('/register', [Control::class, 'register']);
 Route::post('/register', [Control::class, 'aksi_register']);
 
 Route::get('/home', [Control::class, 'home']);
-Route::get('/tambah_pulsa', [Control::class, 'tambah_pulsa']);
 
-Route::get('/profil', [Control::class, 'profil'])->name('profil');
+Route::get('/profil', [Control::class, 'profil'])
+    ->middleware('CheckMenuPermission:profil')
+    ->name('profil');
 Route::post('/profile/update', [Control::class, 'updateProfil']);
-Route::get('/data-user', [Control::class, 'dataUser'])->name('data.user');
 
-Route::get('/paket_data', [Control::class, 'paketData'])->name('paket.data');
-Route::get('/paket_data/filter', [Control::class, 'filterPaket'])->name('paket.filter');
+Route::get('/paket_data', [Control::class, 'paketData'])
+    ->middleware('CheckMenuPermission:paket_data')
+    ->name('paket.data');
+Route::get('/paket_data/filter', [Control::class, 'filterPaket'])
+    ->middleware('CheckMenuPermission:paket_data')
+    ->name('paket.filter');
 
 Route::get('/tambah-pulsa', [Control::class, 'tambah_pulsa'])->name('tambah_pulsa');
 Route::post('/beli-pulsa', [Control::class, 'beliPulsa'])->name('beli_pulsa');
@@ -35,7 +39,31 @@ Route::post('/process-kuota-purchase', [Control::class, 'processPurchaseKuota'])
 Route::post('/midtrans/notification', [Control::class, 'midtransNotification'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
     ->name('midtrans.notification');
-Route::get('/riwayat-transaksi', [Control::class, 'riwayatTransaksi'])->name('riwayat.transaksi');
 
-Route::get('/level1-transactions', [App\Http\Controllers\Control::class, 'level1Transactions'])->name('level1.transactions');
-Route::get('/data-user', [App\Http\Controllers\Control::class, 'dataUser'])->name('data.user');
+Route::get('/riwayat-transaksi', [Control::class, 'riwayatTransaksi'])
+    ->middleware('CheckMenuPermission:data_transaksi')
+    ->name('riwayat.transaksi');
+
+Route::get('/laporan-penjualan', [Control::class, 'laporanPenjualan'])
+    ->name('laporan.penjualan');
+
+Route::get('/statistik-produk', [Control::class, 'statistikProduk'])
+    ->name('statistik.produk');
+
+Route::get('/level1-transactions', [Control::class, 'level1Transactions'])
+    ->middleware('CheckMenuPermission:data_transaksi')
+    ->name('level1.transactions');
+
+Route::get('/data-user', [Control::class, 'dataUser'])
+    ->middleware('CheckMenuPermission:data_user')
+    ->name('data.user');
+
+Route::get('/data-admin', [Control::class, 'dataAdmin'])
+    ->middleware('CheckMenuPermission:data_admin')
+    ->name('data.admin');
+
+Route::middleware(['auth.session'])->group(function () {
+    // Hak akses (hanya superadmin)
+    Route::get('/hak-akses', [Control::class, 'hakAkses'])->name('hak_akses');
+    Route::post('/hak-akses/update', [Control::class, 'updateHakAkses'])->name('hak_akses.update');
+});
