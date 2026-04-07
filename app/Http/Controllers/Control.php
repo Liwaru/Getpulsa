@@ -1176,7 +1176,6 @@ public function level1Transactions()
             'data_user',
             'data_admin',
             'data_transaksi',
-            'laporan_penjualan',
         ];
 
         // Ambil data permission dari database

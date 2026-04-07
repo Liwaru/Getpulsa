@@ -9,6 +9,7 @@
     .access-card {
         width: 100%;
         max-width: 900px;
+        margin: 0 auto;
         background: #ffffff;
         border-radius: 1rem;
         box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.15);
@@ -101,32 +102,7 @@
     }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const contentArea = document.querySelector('.content-area');
-        const pageContent = document.getElementById('hak-akses-content');
-        if (contentArea && pageContent) {
-            // Fix content-area styling
-            contentArea.style.marginLeft = '280px';
-            contentArea.style.padding = '20px';
-            contentArea.style.minHeight = '100vh';
-            contentArea.style.backgroundColor = '#f5f7fa';
-            contentArea.style.display = 'flex';
-            contentArea.style.justifyContent = 'center';
-            contentArea.style.alignItems = 'center';
-            contentArea.style.paddingTop = '30px';
-
-            // Pindahkan konten ke content-area
-            contentArea.appendChild(pageContent);
-            pageContent.style.display = 'block';
-            pageContent.style.width = '100%';
-            pageContent.style.maxWidth = '900px';
-        }
-    });
-</script>
-
-<!-- Konten tersembunyi dulu, dipindah ke .content-area via JS -->
-<div id="hak-akses-content" style="display:none;">
+<div class="content-area">
     <div class="access-card">
         <div class="access-header">
             <i class="bi bi-shield-lock"></i> Pengaturan Hak Akses Menu

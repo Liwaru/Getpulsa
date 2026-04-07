@@ -191,7 +191,15 @@
         #filterNominalPulsa {
             width: 72px;
         }
+        #filterNamaPulsa,
+        #filterNamaKuota {
+            width: 100px;
+        }
 
+        #filterNoHpPulsa,
+        #filterNoHpKuota {
+            width: 100px;
+        }
         .filter-bar button {
             padding: 0.4rem 0.7rem;
             border: none;
@@ -226,12 +234,16 @@
             <button class="tab-btn" id="tabKuota">Transaksi Kuota</button>
             <div class="filter-bar" id="pulsaFilterBar">
                 <input type="date" id="filterTanggalPulsa" placeholder="Tanggal">
+                <input type="text" id="filterNamaPulsa" placeholder="Nama">
+                <input type="text" id="filterNoHpPulsa" placeholder="No HP">
                 <input type="text" id="filterNominalPulsa" placeholder="Nominal">
                 <button type="button" class="btn-search" id="searchPulsaBtn">Search</button>
                 <button type="button" class="btn-reset" id="resetPulsaBtn">Reset</button>
             </div>
             <div class="filter-bar" id="kuotaFilterBar" style="display: none;">
                 <input type="date" id="filterTanggalKuota" placeholder="Tanggal">
+                <input type="text" id="filterNamaKuota" placeholder="Nama">
+                <input type="text" id="filterNoHpKuota" placeholder="No HP">
                 <input type="text" id="filterNominalKuota" placeholder="Nominal">
                 <button type="button" class="btn-search" id="searchKuotaBtn">Search</button>
                 <button type="button" class="btn-reset" id="resetKuotaBtn">Reset</button>
@@ -338,10 +350,14 @@
     const pulsaFilterBar = document.getElementById('pulsaFilterBar');
     const kuotaFilterBar = document.getElementById('kuotaFilterBar');
     const filterTanggalPulsa = document.getElementById('filterTanggalPulsa');
+    const filterNamaPulsa = document.getElementById('filterNamaPulsa');
+    const filterNoHpPulsa = document.getElementById('filterNoHpPulsa');
     const filterNominalPulsa = document.getElementById('filterNominalPulsa');
     const searchPulsaBtn = document.getElementById('searchPulsaBtn');
     const resetPulsaBtn = document.getElementById('resetPulsaBtn');
     const filterTanggalKuota = document.getElementById('filterTanggalKuota');
+    const filterNamaKuota = document.getElementById('filterNamaKuota');
+    const filterNoHpKuota = document.getElementById('filterNoHpKuota');
     const filterNominalKuota = document.getElementById('filterNominalKuota');
     const searchKuotaBtn = document.getElementById('searchKuotaBtn');
     const resetKuotaBtn = document.getElementById('resetKuotaBtn');
@@ -372,32 +388,44 @@
 
     function filterPulsaRows() {
         const tanggal = filterTanggalPulsa.value.trim();
+        const nama = filterNamaPulsa.value.trim().toLowerCase();
+        const nohp = filterNoHpPulsa.value.trim().toLowerCase();
         const nominal = normalizeNominal(filterNominalPulsa.value.trim());
         pulsaRows.forEach((row) => {
             const matchTanggal = !tanggal || row.dataset.tanggal === tanggal;
+            const matchNama = !nama || row.dataset.nama.includes(nama);
+            const matchNohp = !nohp || row.dataset.nohp.includes(nohp);
             const matchNominal = !nominal || row.dataset.nominal.includes(nominal);
-            row.style.display = matchTanggal && matchNominal ? '' : 'none';
+            row.style.display = matchTanggal && matchNama && matchNohp && matchNominal ? '' : 'none';
         });
     }
 
     function filterKuotaRows() {
         const tanggal = filterTanggalKuota.value.trim();
+        const nama = filterNamaKuota.value.trim().toLowerCase();
+        const nohp = filterNoHpKuota.value.trim().toLowerCase();
         const nominal = normalizeNominal(filterNominalKuota.value.trim());
         kuotaRows.forEach((row) => {
             const matchTanggal = !tanggal || row.dataset.tanggal === tanggal;
+            const matchNama = !nama || row.dataset.nama.includes(nama);
+            const matchNohp = !nohp || row.dataset.nohp.includes(nohp);
             const matchNominal = !nominal || row.dataset.nominal.includes(nominal);
-            row.style.display = matchTanggal && matchNominal ? '' : 'none';
+            row.style.display = matchTanggal && matchNama && matchNohp && matchNominal ? '' : 'none';
         });
     }
 
     function resetPulsaFilters() {
         filterTanggalPulsa.value = '';
+        filterNamaPulsa.value = '';
+        filterNoHpPulsa.value = '';
         filterNominalPulsa.value = '';
         pulsaRows.forEach((row) => { row.style.display = ''; });
     }
 
     function resetKuotaFilters() {
         filterTanggalKuota.value = '';
+        filterNamaKuota.value = '';
+        filterNoHpKuota.value = '';
         filterNominalKuota.value = '';
         kuotaRows.forEach((row) => { row.style.display = ''; });
     }
