@@ -22,6 +22,7 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
+            padding-left: calc(280px + 1.5rem);
         }
 
         .payment-card {
@@ -250,6 +251,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
 
             .payment-inner {
@@ -263,6 +265,12 @@
             .method-item img {
                 width: 40px;
                 height: 40px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .payment-card {
+                max-width: min(720px, calc(100vw - 280px - 3rem));
             }
         }
     </style>

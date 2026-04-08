@@ -24,6 +24,7 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
+            padding-left: calc(280px + 1.5rem);
         }
         .white-dashboard {
             max-width: 800px;
@@ -109,12 +110,19 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
             .dashboard-inner {
                 padding: 1rem;
             }
             .pulsa-list {
                 gap: 0.75rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .white-dashboard {
+                max-width: min(800px, calc(100vw - 280px - 3rem));
             }
         }
     </style>

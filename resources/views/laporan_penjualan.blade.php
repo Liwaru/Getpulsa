@@ -132,6 +132,12 @@
         }
     }
 
+    @media (min-width: 769px) {
+        .laporan-container {
+            max-width: min(1200px, calc(100vw - 280px - 3rem));
+        }
+    }
+
     .card {
         background: white;
         border-radius: 12px;

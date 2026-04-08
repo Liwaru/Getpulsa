@@ -21,13 +21,14 @@
             min-height: 100vh;
             display: flex;
             align-items: flex-start;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-left: calc(280px + 1.5rem);
         }
 
         .white-dashboard {
-            max-width: 1000px;
+            max-width: 1120px;
             width: 100%;
-            margin: 2rem auto 0 auto;
+            margin: 2rem auto 0 0;
             background: #ffffff;
             border-radius: 2rem;
             box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
@@ -54,6 +55,21 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid #eef2f8;
             width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .table-card {
+            margin-top: 1rem;
+            border: 1px solid #edf2f7;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         .tab-btn {
@@ -89,7 +105,7 @@
         .transaksi-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            min-width: 840px;
         }
 
         .transaksi-table th,
@@ -103,10 +119,12 @@
             background: #f8fafd;
             font-weight: 600;
             color: #1e2f41;
+            white-space: nowrap;
         }
 
         .transaksi-table td {
             color: #2c3e4e;
+            vertical-align: middle;
         }
 
         .status-badge {
@@ -141,6 +159,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
             .dashboard-inner {
                 padding: 1rem;
@@ -160,6 +179,10 @@
                 margin-left: 0;
                 padding-bottom: 0.75rem;
                 flex-wrap: wrap;
+            }
+            .white-dashboard {
+                margin-top: 4.5rem;
+                border-radius: 1.5rem;
             }
         }
 
@@ -222,6 +245,12 @@
             background: #e5e9f2;
             color: #23374d;
         }
+
+        @media (min-width: 769px) {
+            .white-dashboard {
+                width: calc(100vw - 280px - 3rem);
+            }
+        }
     </style>
 </head>
 <body>
@@ -252,92 +281,100 @@
 
         <!-- Tabel Transaksi Pulsa -->
         <div id="pulsaContainer">
-            <table class="transaksi-table">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Nama</th>
-                        <th>No HP</th>
-                        <th>Nominal</th>
-                        <th>Metode</th>
-                        <th>Produk</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($pulsaTransactions as $trans)
-                        <tr
-                            data-tanggal="{{ \Carbon\Carbon::parse($trans->tanggal)->format('Y-m-d') }}"
-                            data-nama="{{ strtolower($trans->user_nama ?? session('nama') ?? '-') }}"
-                            data-nohp="{{ strtolower($trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-') }}"
-                            data-nominal="{{ $trans->pulsa_masuk }}"
-                        >
-                            <td>{{ \Carbon\Carbon::parse($trans->tanggal)->format('d/m/Y H:i') }}</td>
-                            <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
-                            <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
-                            <td>Rp{{ number_format($trans->pulsa_masuk, 0, ',', '.') }}</td>
-                            <td>
-                                @if($trans->payment_channel)
-                                    <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
-                                @else
-                                    <span style="color:#8f9bb3;">-</span>
-                                @endif
-                            </td>
-                            <td>{{ $trans->nama_pulsa ?? 'Pulsa ' . $trans->nominal_pulsa }}</td>
-                            <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="no-data">Belum ada transaksi pulsa</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="transaksi-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama</th>
+                                <th>No HP</th>
+                                <th>Nominal</th>
+                                <th>Metode</th>
+                                <th>Produk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pulsaTransactions as $trans)
+                                <tr
+                                    data-tanggal="{{ \Carbon\Carbon::parse($trans->tanggal)->format('Y-m-d') }}"
+                                    data-nama="{{ strtolower($trans->user_nama ?? session('nama') ?? '-') }}"
+                                    data-nohp="{{ strtolower($trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-') }}"
+                                    data-nominal="{{ $trans->pulsa_masuk }}"
+                                >
+                                    <td>{{ \Carbon\Carbon::parse($trans->tanggal)->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
+                                    <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
+                                    <td>Rp{{ number_format($trans->pulsa_masuk, 0, ',', '.') }}</td>
+                                    <td>
+                                        @if($trans->payment_channel)
+                                            <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
+                                        @else
+                                            <span style="color:#8f9bb3;">-</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $trans->nama_pulsa ?? 'Pulsa ' . $trans->nominal_pulsa }}</td>
+                                    <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="no-data">Belum ada transaksi pulsa</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Tabel Transaksi Kuota -->
         <div id="kuotaContainer" style="display: none;">
-            <table class="transaksi-table">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Nama</th>
-                        <th>No HP</th>
-                        <th>Nominal</th>
-                        <th>Metode</th>
-                        <th>Produk</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($kuotaTransactions as $trans)
-                        <tr
-                            data-tanggal="{{ \Carbon\Carbon::parse($trans->tanggal)->format('Y-m-d') }}"
-                            data-nama="{{ strtolower($trans->user_nama ?? session('nama') ?? '-') }}"
-                            data-nohp="{{ strtolower($trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-') }}"
-                            data-nominal="{{ $trans->pulsa_keluar }}"
-                        >
-                            <td>{{ \Carbon\Carbon::parse($trans->tanggal)->format('d/m/Y H:i') }}</td>
-                            <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
-                            <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
-                            <td>Rp{{ number_format($trans->pulsa_keluar, 0, ',', '.') }}</td>
-                            <td>
-                                @if($trans->payment_channel)
-                                    <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
-                                @else
-                                    <span style="color:#8f9bb3;">-</span>
-                                @endif
-                            </td>
-                            <td>{{ $trans->nama_kuota ?? 'Paket Data ' . $trans->kuota }}</td>
-                            <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="no-data">Belum ada transaksi kuota</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="transaksi-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama</th>
+                                <th>No HP</th>
+                                <th>Nominal</th>
+                                <th>Metode</th>
+                                <th>Produk</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($kuotaTransactions as $trans)
+                                <tr
+                                    data-tanggal="{{ \Carbon\Carbon::parse($trans->tanggal)->format('Y-m-d') }}"
+                                    data-nama="{{ strtolower($trans->user_nama ?? session('nama') ?? '-') }}"
+                                    data-nohp="{{ strtolower($trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-') }}"
+                                    data-nominal="{{ $trans->pulsa_keluar }}"
+                                >
+                                    <td>{{ \Carbon\Carbon::parse($trans->tanggal)->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $trans->user_nama ?? session('nama') ?? '-' }}</td>
+                                    <td>{{ $trans->user_no_hp ?? $trans->no_hp_user ?? session('no_hp_user') ?? '-' }}</td>
+                                    <td>Rp{{ number_format($trans->pulsa_keluar, 0, ',', '.') }}</td>
+                                    <td>
+                                        @if($trans->payment_channel)
+                                            <span class="method-badge">{{ ucfirst($trans->payment_channel) }}</span>
+                                        @else
+                                            <span style="color:#8f9bb3;">-</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $trans->nama_kuota ?? 'Paket Data ' . $trans->kuota }}</td>
+                                    <td><span class="status-badge status-berhasil">{{ ucfirst($trans->status) }}</span></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="no-data">Belum ada transaksi kuota</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -24,6 +24,7 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
+            padding-left: calc(280px + 1.5rem);
         }
 
         .white-dashboard {
@@ -198,12 +199,19 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
             .dashboard-inner {
                 padding: 1rem;
             }
             .paket-list {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .white-dashboard {
+                max-width: min(1200px, calc(100vw - 280px - 3rem));
             }
         }
 

@@ -29,6 +29,7 @@
 
         .qris-layout {
             margin-left: 280px;
+            width: calc(100vw - 280px);
             min-height: 100vh;
             display: flex;
             justify-content: center;

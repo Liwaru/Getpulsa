@@ -22,6 +22,7 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            padding-left: calc(280px + 1.5rem);
         }
 
         .page-shell {
@@ -195,6 +196,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
             .page-shell {
                 margin-top: 1rem;
@@ -219,6 +221,12 @@
             }
             .user-table {
                 min-width: 480px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .page-shell {
+                max-width: min(900px, calc(100vw - 280px - 3rem));
             }
         }
     </style>

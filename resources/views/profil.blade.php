@@ -22,6 +22,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding-left: calc(280px + 1.5rem);
         }
 
         /* MAIN WHITE CARD (sama dengan dashboard) */
@@ -184,6 +185,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
+                padding-left: 1rem;
             }
             .dashboard-inner {
                 padding: 1.5rem;
@@ -195,6 +197,12 @@
             }
             .profile-header h2 {
                 font-size: 1.3rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .white-dashboard {
+                max-width: min(600px, calc(100vw - 280px - 3rem));
             }
         }
     </style>

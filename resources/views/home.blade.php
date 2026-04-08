@@ -22,15 +22,16 @@
             padding: 1.5rem;
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding-left: calc(280px + 1.5rem);
         }
 
         /* MAIN WHITE CARD (TABLE / CONTAINER) - DIPERBESAR */
         .white-dashboard {
             max-width: 1200px;
             width: 100%;
-            margin: 0 auto;
+            margin: 0 auto 0 0;
             background: #ffffff;
             border-radius: 2rem;
             box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.02);
@@ -470,8 +471,13 @@
 
         /* Responsif */
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                padding-left: 1rem;
+            }
             .white-dashboard {
                 max-width: 95%;
+                margin-top: 4.5rem;
             }
             .dashboard-inner {
                 padding: 1.2rem;
@@ -502,6 +508,12 @@
                 padding: 8px 16px;
                 font-size: 0.8rem;
                 top: 10px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .white-dashboard {
+                width: calc(100vw - 280px - 3rem);
             }
         }
     </style>

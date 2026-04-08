@@ -3,7 +3,12 @@
 <style>
     body {
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 1.5rem 1.5rem 1.5rem calc(280px + 1.5rem) !important;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background: linear-gradient(145deg, #e9eef3 0%, #dce2ea 100%);
     }
 
     .access-card {
@@ -90,6 +95,9 @@
     }
 
     @media (max-width: 768px) {
+        body {
+            padding: 1rem !important;
+        }
         .access-table th,
         .access-table td {
             padding: 0.4rem 0.5rem;
@@ -100,9 +108,17 @@
             width: 100%;
         }
     }
+
+    @media (min-width: 769px) {
+        #hak-akses-content {
+            width: 100%;
+            max-width: min(900px, calc(100vw - 280px - 3rem));
+            margin-top: 2rem;
+        }
+    }
 </style>
 
-<div class="content-area">
+<div id="hak-akses-content">
     <div class="access-card">
         <div class="access-header">
             <i class="bi bi-shield-lock"></i> Pengaturan Hak Akses Menu
@@ -139,7 +155,7 @@
                     </table>
                 </div>
                 <button type="submit" class="btn-save">
-                    <i class="bi bi-save"></i> Simpan Perubahan
+                   Simpan Perubahan
                 </button>
             </form>
         </div>
